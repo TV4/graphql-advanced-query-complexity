@@ -1,0 +1,24 @@
+{
+  "name": "@tv4/graphql-advanced-query-complexity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TV4/graphql-advanced-query-complexity.git"
+  },
+  "keywords": [
+    "graphql",
+    "apollo",
+    "complexity"
+  ],
+  "author": "Emil Öberg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TV4/graphql-advanced-query-complexity/issues"
+  },
+  "homepage": "https://github.com/TV4/graphql-advanced-query-complexity#readme"
+}

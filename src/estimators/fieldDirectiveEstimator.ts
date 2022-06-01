@@ -1,5 +1,5 @@
 import { getDirectiveValues, GraphQLDirective } from 'graphql';
-import { ComplexityEstimator } from '..';
+import { ComplexityEstimator, Extra } from '..';
 import { isNumber, isString } from '../utils';
 
 const getDeep = <T>(obj: Record<any, any>, path: string): T | null => {
@@ -19,10 +19,21 @@ export const fieldDirectiveEstimator = (options: { directive: GraphQLDirective }
       return;
     }
 
+    const extra: Extra | undefined = directiveValues.maxTimes
+      ? {
+          maxCalls: {
+            [args.fieldTypeName]: {
+              maxTimes: directiveValues.maxTimes,
+              mergeValue: 1,
+            },
+          },
+        }
+      : undefined;
+
     const cost = isNumber(directiveValues.cost) ? directiveValues.cost : 0;
     const multiplierString = isString(directiveValues.multiplier) ? directiveValues.multiplier : null;
     const multiplier = multiplierString ? getDeep<number>(args.args, multiplierString) || null : null;
 
-    return { cost, multiplier };
+    return { cost, multiplier, extra };
   };
 };

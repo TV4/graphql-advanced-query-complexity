@@ -308,7 +308,9 @@ class QueryComplexity {
         }
 
         if (x.length !== 1) {
-          throw new Error('x.length !== 1');
+          console.log('output length is a strange format');
+          console.log(require('util').inspect(x, { showHidden: true, depth: null, colors: true, breakLength: 200 }));
+          //throw new Error('x.length !== 1');
         }
 
         this.complexity = {

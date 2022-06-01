@@ -1,6 +1,6 @@
 {
   "name": "@tv4/graphql-advanced-query-complexity",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "files": [

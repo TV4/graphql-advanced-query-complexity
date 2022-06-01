@@ -26,7 +26,7 @@ describe('Basics', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: String @complexity(cost: 7)
+        test: String @advComplexity(cost: 7)
       }
     `;
 
@@ -55,7 +55,7 @@ describe('Basics', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: Enum @complexity(cost: 7)
+        test: Enum @advComplexity(cost: 7)
       }
 
       enum Enum {
@@ -93,8 +93,8 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @complexity(cost: 1)
-        number: Int @complexity(cost: 7)
+        string: String @advComplexity(cost: 1)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -126,12 +126,12 @@ describe('Basics', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: Obj @complexity(cost: 2)
+        test: Obj @advComplexity(cost: 2)
       }
 
       type Obj {
-        string: String @complexity(cost: 1)
-        number: Int @complexity(cost: 7)
+        string: String @advComplexity(cost: 1)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -169,11 +169,11 @@ describe('Basics', () => {
       union Union = Obj1 | Obj2
 
       type Obj1 {
-        string: String @complexity(cost: 1)
+        string: String @advComplexity(cost: 1)
       }
 
       type Obj2 {
-        number: Int @complexity(cost: 7)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -210,17 +210,17 @@ describe('Basics', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: Union @complexity(cost: 2)
+        test: Union @advComplexity(cost: 2)
       }
 
       union Union = Obj1 | Obj2
 
       type Obj1 {
-        string: String @complexity(cost: 1)
+        string: String @advComplexity(cost: 1)
       }
 
       type Obj2 {
-        number: Int @complexity(cost: 7)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -265,12 +265,12 @@ describe('Basics', () => {
       }
 
       type Impl1 implements Interface {
-        string: String @complexity(cost: 1)
+        string: String @advComplexity(cost: 1)
       }
 
       type Impl2 implements Interface {
-        string: String @complexity(cost: 7)
-        number: Int @complexity(cost: 2)
+        string: String @advComplexity(cost: 7)
+        number: Int @advComplexity(cost: 2)
       }
     `;
 
@@ -308,7 +308,7 @@ describe('Basics', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: Interface @complexity(cost: 3)
+        test: Interface @advComplexity(cost: 3)
       }
 
       interface Interface {
@@ -316,13 +316,13 @@ describe('Basics', () => {
       }
 
       type Impl1 implements Interface {
-        string: String @complexity(cost: 1)
+        string: String @advComplexity(cost: 1)
       }
 
       type Impl2 implements Interface {
-        string: String @complexity(cost: 7)
-        number: Int @complexity(cost: 2)
-        interface: ImplInterface2 @complexity(cost: 3)
+        string: String @advComplexity(cost: 7)
+        number: Int @advComplexity(cost: 2)
+        interface: ImplInterface2 @advComplexity(cost: 3)
       }
 
       interface Interface2 {
@@ -330,7 +330,7 @@ describe('Basics', () => {
       }
 
       type ImplInterface2 implements Interface2 {
-        number: Int @complexity(cost: 5)
+        number: Int @advComplexity(cost: 5)
       }
     `;
 
@@ -375,7 +375,7 @@ describe('Basics', () => {
       }
 
       interface Interface {
-        string: String @complexity(cost: 1)
+        string: String @advComplexity(cost: 1)
       }
 
       type Impl1 implements Interface {
@@ -426,13 +426,13 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @complexity(cost: 2)
-        obj2: Obj2 @complexity(cost: 5)
+        string: String @advComplexity(cost: 2)
+        obj2: Obj2 @advComplexity(cost: 5)
       }
 
       type Obj2 {
-        number: String @complexity(cost: 1)
-        string: String @complexity(cost: 6)
+        number: String @advComplexity(cost: 1)
+        string: String @advComplexity(cost: 6)
       }
     `;
 
@@ -471,26 +471,26 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @complexity(cost: 2)
-        obj2: Obj2 @complexity(cost: 5)
+        string: String @advComplexity(cost: 2)
+        obj2: Obj2 @advComplexity(cost: 5)
         union: Union
       }
 
       type Obj2 {
-        number: String @complexity(cost: 1)
-        string: String @complexity(cost: 6)
+        number: String @advComplexity(cost: 1)
+        string: String @advComplexity(cost: 6)
       }
 
       union Union = Obj3 | Obj4
 
       type Obj3 {
-        number: String @complexity(cost: 2)
-        string: String @complexity(cost: 3)
+        number: String @advComplexity(cost: 2)
+        string: String @advComplexity(cost: 3)
       }
 
       type Obj4 {
-        number: String @complexity(cost: 4)
-        string: String @complexity(cost: 7)
+        number: String @advComplexity(cost: 4)
+        string: String @advComplexity(cost: 7)
       }
     `;
 
@@ -539,8 +539,8 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @complexity(cost: 1)
-        number: Int @complexity(cost: 7)
+        string: String @advComplexity(cost: 1)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -578,12 +578,12 @@ describe('Basics', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: Obj @complexity(cost: 2)
+        test: Obj @advComplexity(cost: 2)
       }
 
       type Obj {
-        string: String @complexity(cost: 1)
-        number: Int @complexity(cost: 7)
+        string: String @advComplexity(cost: 1)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -621,7 +621,7 @@ describe('Basics', () => {
       scalar Scalar
 
       type Query {
-        test: Scalar @complexity(cost: 7)
+        test: Scalar @advComplexity(cost: 7)
       }
     `;
 
@@ -654,8 +654,8 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @complexity(cost: 1)
-        number: Int @complexity(cost: 7)
+        string: String @advComplexity(cost: 1)
+        number: Int @advComplexity(cost: 7)
       }
     `;
 
@@ -689,7 +689,7 @@ describe('Lists', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: [String] @complexity(cost: 7)
+        test: [String] @advComplexity(cost: 7)
       }
     `;
 
@@ -718,7 +718,7 @@ describe('Lists', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test(limit: Int): [String] @complexity(cost: 7, multiplier: "limit")
+        test(limit: Int): [String] @advComplexity(cost: 7, multiplier: "limit")
       }
     `;
 
@@ -753,15 +753,15 @@ describe('Lists', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test(limit: Int): [Obj] @complexity(cost: 7, multiplier: "limit")
+        test(limit: Int): [Obj] @advComplexity(cost: 7, multiplier: "limit")
       }
 
       type Obj {
-        deepObj(amount: Int = 5): [Obj2] @complexity(cost: 6, multiplier: "amount")
+        deepObj(amount: Int = 5): [Obj2] @advComplexity(cost: 6, multiplier: "amount")
       }
 
       type Obj2 {
-        string: String @complexity(cost: 2)
+        string: String @advComplexity(cost: 2)
       }
     `;
 
@@ -802,26 +802,26 @@ describe('Multiple paths', () => {
       ${createComplexityObjectDirectiveSDL()}
 
       type Query {
-        test: Obj @complexity(cost: 2)
+        test: Obj @advComplexity(cost: 2)
       }
 
       union Union = Obj3 | Obj4
 
       type Obj {
-        deepObj2(amount: Int = 5): [Union] @complexity(cost: 6, multiplier: "amount")
-        deepObj3(amount: Int = 4): [Obj2] @complexity(cost: 6, multiplier: "amount")
+        deepObj2(amount: Int = 5): [Union] @advComplexity(cost: 6, multiplier: "amount")
+        deepObj3(amount: Int = 4): [Obj2] @advComplexity(cost: 6, multiplier: "amount")
       }
 
       type Obj2 {
-        string: String @complexity(cost: 2)
+        string: String @advComplexity(cost: 2)
       }
 
       type Obj3 {
-        string: String @complexity(cost: 2)
+        string: String @advComplexity(cost: 2)
       }
 
       type Obj4 {
-        string: String @complexity(cost: 7)
+        string: String @advComplexity(cost: 7)
       }
     `;
 

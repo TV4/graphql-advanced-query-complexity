@@ -8,6 +8,7 @@ type TypeComplexityDirectiveOptions = {
 type CustomAdvComplexityOptions = {
   multiplier?: string;
   cost?: number;
+  maxTimes?: number;
 };
 
 const DEFAULT_ADV_COMPLEXITY_NAME = 'advComplexity';
@@ -30,6 +31,10 @@ export const createComplexityFieldDirective = (options?: TypeComplexityDirective
     multiplier: {
       type: GraphQLString,
       description: 'Field to be used as multiplier',
+    },
+    maxTimes: {
+      type: GraphQLInt,
+      description: 'Max time this type can be requested in a single query',
     },
   };
 

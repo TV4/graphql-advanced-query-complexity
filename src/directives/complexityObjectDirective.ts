@@ -37,7 +37,7 @@ export const createComplexityObjectDirective = (options?: TypeComplexityDirectiv
   > = {
     maxTimes: {
       type: GraphQLInt,
-      description: 'Max time this type can be requested in a single query before throwing an error',
+      description: 'Max time this type can be requested in a single query',
     },
     /**
      * Not yet implemented

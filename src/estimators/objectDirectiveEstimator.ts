@@ -16,9 +16,14 @@ export const throwOnMaxCalls = (complexity: PublicComplexity) => {
       const mergeValue = maxCalls[key]?.mergeValue;
 
       if (isNumber(maxTimes) && isNumber(mergeValue) && mergeValue > maxTimes) {
-        throw new GraphQLError(`type ${key} may only be queried ${maxTimes} times. Was queried ${mergeValue} times`, {
-          extensions: { complexity: { code: 'TYPE_CALLED_TO_MANY_TIMES' } },
-        });
+        const [type, actualKey] = key.split('-');
+
+        throw new GraphQLError(
+          `${type} ${actualKey} may only be queried ${maxTimes} times. Was queried ${mergeValue} times`,
+          {
+            extensions: { complexity: { code: 'TYPE_CALLED_TO_MANY_TIMES' } },
+          }
+        );
       }
     }
   }
@@ -42,7 +47,7 @@ export const objectDirectiveEstimator = (options: { directive: GraphQLDirective 
     if (directiveValues.maxTimes) {
       const extra: Extra = {
         maxCalls: {
-          [args.fieldTypeName]: {
+          [`type-${args.fieldTypeName}`]: {
             maxTimes: directiveValues.maxTimes,
             mergeValue: 1,
           },

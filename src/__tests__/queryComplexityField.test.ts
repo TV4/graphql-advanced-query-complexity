@@ -899,7 +899,7 @@ describe('maxItems on field', () => {
       query,
     });
 
-    expect(complexity.extra?.maxCalls.Obj.maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls.Obj.mergeValue).toBe(4);
+    expect(complexity.extra?.maxCalls['field-test'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['field-test'].mergeValue).toBe(4);
   });
 });

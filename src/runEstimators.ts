@@ -30,7 +30,11 @@ export const runEstimators = ({
     }
 
     if ('extra' in estimatorValues) {
-      thisExtra = estimatorValues.extra; // TODO Merge this?!
+      if (thisExtra) {
+        thisExtra = mergeExtra('max', estimatorValues.extra, thisExtra);
+      } else {
+        thisExtra = estimatorValues.extra;
+      }
     }
 
     /**

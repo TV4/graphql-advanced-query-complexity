@@ -9,7 +9,8 @@
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit --pretty",
-    "build": "tsup --dts"
+    "build": "tsup --dts",
+    "devbuildpack": "npm run build && npm pack"
   },
   "repository": {
     "type": "git",

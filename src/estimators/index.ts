@@ -1,7 +1,4 @@
-import { fieldDirectiveEstimator } from "./fieldDirectiveEstimator";
-import {
-  objectDirectiveEstimator,
-  throwOnMaxCalls,
-} from "./objectDirectiveEstimator";
+import { fieldDirectiveEstimator } from './fieldDirectiveEstimator';
+import { objectDirectiveEstimator, throwOnMaxCalls } from './objectDirectiveEstimator';
 
 export { fieldDirectiveEstimator, objectDirectiveEstimator, throwOnMaxCalls };

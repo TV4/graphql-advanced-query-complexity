@@ -1,10 +1,8 @@
-import { mergeExtra } from "./mergeExtra";
-import { nonNullable } from "./utils";
-import { ComplexityNode, Extra } from ".";
+import { mergeExtra } from './mergeExtra';
+import { nonNullable } from './utils';
+import { ComplexityNode, Extra } from '.';
 
-export type GetChildComplexity = (
-  children: ComplexityNode[] | null
-) => ChildComplexity;
+export type GetChildComplexity = (children: ComplexityNode[] | null) => ChildComplexity;
 
 export type ChildComplexity = {
   children: ComplexityNode[];
@@ -23,7 +21,7 @@ export const getChildComplexity: GetChildComplexity = (children) => {
   if (children[0].isInlineFragmentType) {
     // Check Only for development, remove in production
     if (!children.every((x) => x.isInlineFragmentType)) {
-      throw new Error("Not every child is an inlineFragmentType");
+      throw new Error('Not every child is an inlineFragmentType');
     }
 
     const sortedChildren = children.sort((a, b) => b.cost - a.cost);
@@ -34,10 +32,7 @@ export const getChildComplexity: GetChildComplexity = (children) => {
     return {
       children: sortedChildren,
       childComplexity,
-      extra: mergeExtra(
-        "max",
-        ...children.map((child) => child.extra).filter(nonNullable)
-      ),
+      extra: mergeExtra('max', ...children.map((child) => child.extra).filter(nonNullable)),
     };
   }
 
@@ -54,9 +49,6 @@ export const getChildComplexity: GetChildComplexity = (children) => {
   return {
     children: selectedChildren,
     childComplexity,
-    extra: mergeExtra(
-      "sum",
-      ...children.map((child) => child.extra).filter(nonNullable)
-    ),
+    extra: mergeExtra('sum', ...children.map((child) => child.extra).filter(nonNullable)),
   };
 };

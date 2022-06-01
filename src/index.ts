@@ -20,16 +20,13 @@ import {
   ValidationContext,
   visit,
   visitWithTypeInfo,
-} from "graphql";
-import {
-  getDirectiveValues,
-  getVariableValues,
-} from "graphql/execution/values";
+} from 'graphql';
+import { getDirectiveValues, getVariableValues } from 'graphql/execution/values';
 
-import { handleField } from "./handleField";
-import { handleFragmentSpread } from "./handleFragmentSpread";
-import { handleInlineFragment } from "./handleInlineFragment";
-import { isBoolean, nonNullable } from "./utils";
+import { handleField } from './handleField';
+import { handleFragmentSpread } from './handleFragmentSpread';
+import { handleInlineFragment } from './handleInlineFragment';
+import { isBoolean, nonNullable } from './utils';
 
 export type ComplexityNode = {
   name: string;
@@ -85,10 +82,7 @@ export interface QueryComplexityOptions {
 }
 
 function queryComplexityMessage(max: number, actual: number): string {
-  return (
-    `The query exceeds the maximum complexity of ${max}. ` +
-    `Actual complexity is ${actual}`
-  );
+  return `The query exceeds the maximum complexity of ${max}. ` + `Actual complexity is ${actual}`;
 }
 
 export type ComplexityPostCheck = (complexity: PublicComplexity) => void;
@@ -104,12 +98,7 @@ export function getComplexity(options: {
   const typeInfo = new TypeInfo(options.schema);
 
   const errors: GraphQLError[] = [];
-  const context = new ValidationContext(
-    options.schema,
-    options.query,
-    typeInfo,
-    (error) => errors.push(error)
-  );
+  const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
   const visitor = new QueryComplexity(context, {
     // Maximum complexity does not matter since we're only interested in the calculated complexity.
     maximumComplexity: Infinity,
@@ -144,22 +133,14 @@ const includeNode = (
   for (const directive of childNode.directives ?? []) {
     const directiveName = directive.name.value;
     switch (directiveName) {
-      case "include": {
-        const values = getDirectiveValues(
-          includeDirectiveDef,
-          childNode,
-          variableValues || {}
-        );
+      case 'include': {
+        const values = getDirectiveValues(includeDirectiveDef, childNode, variableValues || {});
         const ifClause = values?.if;
         includeNode = isBoolean(ifClause) ? ifClause : true;
         break;
       }
-      case "skip": {
-        const values = getDirectiveValues(
-          skipDirectiveDef,
-          childNode,
-          variableValues || {}
-        );
+      case 'skip': {
+        const values = getDirectiveValues(skipDirectiveDef, childNode, variableValues || {});
         const ifClause = values?.if;
         skipNode = isBoolean(ifClause) ? ifClause : false;
         break;
@@ -171,11 +152,7 @@ const includeNode = (
 };
 
 export type GetNodeComplexity = (
-  node:
-    | FieldNode
-    | FragmentDefinitionNode
-    | InlineFragmentNode
-    | OperationDefinitionNode,
+  node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode,
   typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
   validationContext: ValidationContext,
   includeDirectiveDef: GraphQLDirective,
@@ -196,29 +173,17 @@ const getChilds: GetNodeComplexity = (
   schema
 ) => {
   let fields: GraphQLFieldMap<any, any> = {};
-  if (
-    typeDef instanceof GraphQLObjectType ||
-    typeDef instanceof GraphQLInterfaceType
-  ) {
+  if (typeDef instanceof GraphQLObjectType || typeDef instanceof GraphQLInterfaceType) {
     fields = typeDef.getFields();
   }
 
   if (!node.selectionSet) {
-    throw new Error(
-      "No selectionSet, probably not real error and this throw should be removed"
-    );
+    throw new Error('No selectionSet, probably not real error and this throw should be removed');
   }
 
   const children = node.selectionSet.selections.map(
     (childNode: FieldNode | FragmentSpreadNode | InlineFragmentNode) => {
-      if (
-        !includeNode(
-          childNode,
-          includeDirectiveDef,
-          skipDirectiveDef,
-          variableValues
-        )
-      ) {
+      if (!includeNode(childNode, includeDirectiveDef, skipDirectiveDef, variableValues)) {
         return null;
       }
 
@@ -292,23 +257,16 @@ class QueryComplexity {
   variableValues: Record<string, any>;
 
   constructor(context: ValidationContext, options: QueryComplexityOptions) {
-    if (
-      !(
-        typeof options.maximumComplexity === "number" &&
-        options.maximumComplexity > 0
-      )
-    ) {
-      throw new Error("Maximum query complexity must be a positive number");
+    if (!(typeof options.maximumComplexity === 'number' && options.maximumComplexity > 0)) {
+      throw new Error('Maximum query complexity must be a positive number');
     }
 
     this.context = context;
     this.complexity = { cost: 0, tree: null };
     this.options = options;
 
-    this.includeDirectiveDef = this.context
-      .getSchema()
-      .getDirective("include")!;
-    this.skipDirectiveDef = this.context.getSchema().getDirective("skip")!;
+    this.includeDirectiveDef = this.context.getSchema().getDirective('include')!;
+    this.skipDirectiveDef = this.context.getSchema().getDirective('skip')!;
     this.estimators = options.estimators;
     this.variableValues = {};
 
@@ -319,10 +277,7 @@ class QueryComplexity {
   }
 
   onOperationDefinitionEnter(operation: OperationDefinitionNode): void {
-    if (
-      typeof this.options.operationName === "string" &&
-      this.options.operationName !== operation.name?.value
-    ) {
+    if (typeof this.options.operationName === 'string' && this.options.operationName !== operation.name?.value) {
       return;
     }
 
@@ -335,7 +290,7 @@ class QueryComplexity {
     ).coerced!;
 
     switch (operation.operation) {
-      case "query":
+      case 'query':
         // this.complexity += this.nodeComplexity(operation, this.context.getSchema().getQueryType()!);
         const x = getChilds(
           operation,
@@ -349,11 +304,11 @@ class QueryComplexity {
         );
 
         if (!x) {
-          throw new Error("x is null");
+          throw new Error('x is null');
         }
 
         if (x.length !== 1) {
-          throw new Error("x.length !== 1");
+          throw new Error('x.length !== 1');
         }
 
         this.complexity = {
@@ -363,26 +318,21 @@ class QueryComplexity {
           tree: x[0],
         };
         break;
-      case "mutation":
+      case 'mutation':
         // TODO: Add
         // this.complexity += this.nodeComplexity(operation, this.context.getSchema().getMutationType()!);
         break;
-      case "subscription":
+      case 'subscription':
         // TODO: Add
         // this.complexity += this.nodeComplexity(operation, this.context.getSchema().getSubscriptionType()!);
         break;
       default:
-        throw new Error(
-          `Query complexity could not be calculated for operation of type ${operation.operation}`
-        );
+        throw new Error(`Query complexity could not be calculated for operation of type ${operation.operation}`);
     }
   }
 
   onOperationDefinitionLeave(operation: OperationDefinitionNode): void {
-    if (
-      typeof this.options.operationName === "string" &&
-      this.options.operationName !== operation.name?.value
-    ) {
+    if (typeof this.options.operationName === 'string' && this.options.operationName !== operation.name?.value) {
       return;
     }
 
@@ -396,17 +346,9 @@ class QueryComplexity {
   }
 
   createError(): GraphQLError {
-    if (typeof this.options.createError === "function") {
-      return this.options.createError(
-        this.options.maximumComplexity,
-        this.complexity.cost
-      );
+    if (typeof this.options.createError === 'function') {
+      return this.options.createError(this.options.maximumComplexity, this.complexity.cost);
     }
-    return new GraphQLError(
-      queryComplexityMessage(
-        this.options.maximumComplexity,
-        this.complexity.cost
-      )
-    );
+    return new GraphQLError(queryComplexityMessage(this.options.maximumComplexity, this.complexity.cost));
   }
 }

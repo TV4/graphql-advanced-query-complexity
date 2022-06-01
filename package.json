@@ -26,13 +26,29 @@
     "url": "https://github.com/TV4/graphql-advanced-query-complexity/issues"
   },
   "homepage": "https://github.com/TV4/graphql-advanced-query-complexity#readme",
+  "lint-staged": {
+    "src/**/*.{js,json,ts,css,md}": [
+      "eslint 'src/**/*.ts' -f codeframe --max-warnings 2",
+      "prettier --write"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 120,
+    "tabWidth": 2
+  },
   "devDependencies": {
     "@types/jest": "^27.5.1",
     "graphql-tag": "^2.12.6",
     "jest": "^28.1.0",
+    "lint-staged": "^13.0.0",
+    "prettier": "^2.6.2",
     "ts-jest": "^28.0.3",
     "tsup": "^6.0.1",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.2",
+    "graphql": "^16.5.0",
+    "@graphql-tools/schema": "^8.3.13",
+    "@graphql-tools/utils": "^8.6.12"
   },
   "dependencies": {
     "deepmerge-ts": "^4.0.3"

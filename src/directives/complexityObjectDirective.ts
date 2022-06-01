@@ -1,4 +1,4 @@
-import { astFromDirective } from "@graphql-tools/utils";
+import { astFromDirective } from '@graphql-tools/utils';
 import {
   GraphQLDirective,
   GraphQLInputType,
@@ -8,9 +8,9 @@ import {
   GraphQLInt,
   DirectiveLocation,
   print,
-} from "graphql";
+} from 'graphql';
 
-const DEFAULT_TYPE_COMPLEXITY_NAME = "objComplexity";
+const DEFAULT_TYPE_COMPLEXITY_NAME = 'objComplexity';
 
 export type TypeComplexityDirectiveOptions = {
   name?: string;
@@ -24,13 +24,10 @@ type CustomTypeComplexityOptions = {
   // batchSize?: number;
 };
 
-export const createComplexityObjectDirectiveSDL = (
-  options?: TypeComplexityDirectiveOptions
-) => print(astFromDirective(createComplexityObjectDirective(options)));
+export const createComplexityObjectDirectiveSDL = (options?: TypeComplexityDirectiveOptions) =>
+  print(astFromDirective(createComplexityObjectDirective(options)));
 
-export const createComplexityObjectDirective = (
-  options?: TypeComplexityDirectiveOptions
-): GraphQLDirective => {
+export const createComplexityObjectDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
   const args: Record<
     keyof CustomTypeComplexityOptions,
     {
@@ -40,8 +37,7 @@ export const createComplexityObjectDirective = (
   > = {
     maxTimes: {
       type: GraphQLInt,
-      description:
-        "Max time this type can be requested in a single query before throwing an error",
+      description: 'Max time this type can be requested in a single query before throwing an error',
     },
     /**
      * Not yet implemented
@@ -68,7 +64,7 @@ export const createComplexityObjectDirective = (
 
   return new GraphQLDirective({
     name: options?.name || DEFAULT_TYPE_COMPLEXITY_NAME,
-    description: "",
+    description: '',
     locations: [DirectiveLocation.OBJECT],
     args,
   });

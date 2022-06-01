@@ -1,5 +1,5 @@
-import { mergeExtra } from "./mergeExtra";
-import { getArgumentValues } from "@graphql-tools/utils";
+import { mergeExtra } from './mergeExtra';
+import { getArgumentValues } from '@graphql-tools/utils';
 import {
   FieldNode,
   GraphQLObjectType,
@@ -11,21 +11,14 @@ import {
   getNamedType,
   isCompositeType,
   GraphQLSchema,
-} from "graphql";
+} from 'graphql';
 
-import { getChildComplexity } from "./getChildComplexity";
-import {
-  ComplexityEstimator,
-  ComplexityEstimatorArgs,
-  ComplexityNode,
-  Extra,
-  GetNodeComplexity,
-} from ".";
-import { runEstimators } from "./runEstimators";
+import { getChildComplexity } from './getChildComplexity';
+import { ComplexityEstimator, ComplexityEstimatorArgs, ComplexityNode, Extra, GetNodeComplexity } from '.';
+import { runEstimators } from './runEstimators';
 
-const BUILT_IN_SCALAR_NAMES = ["String", "Int", "Float", "Boolean", "ID"];
-const isBuiltInScalar = (typeName: string) =>
-  BUILT_IN_SCALAR_NAMES.includes(typeName);
+const BUILT_IN_SCALAR_NAMES = ['String', 'Int', 'Float', 'Boolean', 'ID'];
+const isBuiltInScalar = (typeName: string) => BUILT_IN_SCALAR_NAMES.includes(typeName);
 
 export const handleField = (
   childNode: FieldNode,

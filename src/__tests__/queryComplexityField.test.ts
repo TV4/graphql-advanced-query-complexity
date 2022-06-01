@@ -1,26 +1,26 @@
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { validateGraphQlDocuments } from "@graphql-tools/utils";
-import gql from "graphql-tag";
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { validateGraphQlDocuments } from '@graphql-tools/utils';
+import gql from 'graphql-tag';
 
 import {
   createComplexityFieldDirective,
   createComplexityFieldDirectiveSDL,
-} from "../directives/complexityFieldDirective";
+} from '../directives/complexityFieldDirective';
 import {
   createComplexityObjectDirective,
   createComplexityObjectDirectiveSDL,
-} from "../directives/complexityObjectDirective";
-import { fieldDirectiveEstimator } from "../estimators/fieldDirectiveEstimator";
-import { objectDirectiveEstimator } from "../estimators/objectDirectiveEstimator";
-import { getComplexity } from "..";
+} from '../directives/complexityObjectDirective';
+import { fieldDirectiveEstimator } from '../estimators/fieldDirectiveEstimator';
+import { objectDirectiveEstimator } from '../estimators/objectDirectiveEstimator';
+import { getComplexity } from '..';
 
 const estimators = [
   objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
   fieldDirectiveEstimator({ directive: createComplexityFieldDirective() }),
 ];
 
-describe("Basics", () => {
-  it("string", async () => {
+describe('Basics', () => {
+  it('string', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -37,9 +37,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -51,7 +49,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(7);
   });
 
-  it("enum", async () => {
+  it('enum', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -73,9 +71,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -87,7 +83,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(7);
   });
 
-  it("simple object", async () => {
+  it('simple object', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -112,9 +108,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -126,7 +120,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(8);
   });
 
-  it("simple object with multi cost", async () => {
+  it('simple object with multi cost', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -151,9 +145,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -165,7 +157,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(10);
   });
 
-  it("union", async () => {
+  it('union', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -199,9 +191,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -214,7 +204,7 @@ describe("Basics", () => {
     expect(true).toBe(true);
   });
 
-  it("union with multi cost", async () => {
+  it('union with multi cost', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -248,9 +238,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -263,7 +251,7 @@ describe("Basics", () => {
     expect(true).toBe(true);
   });
 
-  it("interface", async () => {
+  it('interface', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -301,9 +289,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -316,7 +302,7 @@ describe("Basics", () => {
     expect(true).toBe(true);
   });
 
-  it("interface with multi cost", async () => {
+  it('interface with multi cost', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -366,9 +352,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -381,7 +365,7 @@ describe("Basics", () => {
     expect(true).toBe(true);
   });
 
-  it.skip("Not yet implemented interface with cost on interface", async () => {
+  it.skip('Not yet implemented interface with cost on interface', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -419,9 +403,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -434,7 +416,7 @@ describe("Basics", () => {
     expect(true).toBe(true);
   });
 
-  it("nested object", async () => {
+  it('nested object', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -467,9 +449,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -481,7 +461,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(14);
   });
 
-  it("nested object with unions", async () => {
+  it('nested object with unions', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -537,9 +517,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -551,7 +529,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(25);
   });
 
-  it("fragment", async () => {
+  it('fragment', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -580,9 +558,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -596,7 +572,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(8);
   });
 
-  it("fragment with multi cost", async () => {
+  it('fragment with multi cost', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -625,9 +601,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -639,7 +613,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(10);
   });
 
-  it("custom scalar", async () => {
+  it('custom scalar', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -658,9 +632,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -672,7 +644,7 @@ describe("Basics", () => {
     expect(complexity.cost).toBe(7);
   });
 
-  it("skip and include", async () => {
+  it('skip and include', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -697,9 +669,7 @@ describe("Basics", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -712,8 +682,8 @@ describe("Basics", () => {
   });
 });
 
-describe("Lists", () => {
-  it("without multiplier", async () => {
+describe('Lists', () => {
+  it('without multiplier', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -730,9 +700,7 @@ describe("Lists", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -744,7 +712,7 @@ describe("Lists", () => {
     expect(complexity.cost).toBe(7);
   });
 
-  it("string with multiplier", async () => {
+  it('string with multiplier', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -767,9 +735,7 @@ describe("Lists", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -781,7 +747,7 @@ describe("Lists", () => {
     expect(complexity.cost).toBe(7);
   });
 
-  it("nested multipliers", async () => {
+  it('nested multipliers', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -791,8 +757,7 @@ describe("Lists", () => {
       }
 
       type Obj {
-        deepObj(amount: Int = 5): [Obj2]
-          @complexity(cost: 6, multiplier: "amount")
+        deepObj(amount: Int = 5): [Obj2] @complexity(cost: 6, multiplier: "amount")
       }
 
       type Obj2 {
@@ -817,9 +782,7 @@ describe("Lists", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -832,8 +795,8 @@ describe("Lists", () => {
   });
 });
 
-describe("Multiple paths", () => {
-  it("objects and lists", async () => {
+describe('Multiple paths', () => {
+  it('objects and lists', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -845,10 +808,8 @@ describe("Multiple paths", () => {
       union Union = Obj3 | Obj4
 
       type Obj {
-        deepObj2(amount: Int = 5): [Union]
-          @complexity(cost: 6, multiplier: "amount")
-        deepObj3(amount: Int = 4): [Obj2]
-          @complexity(cost: 6, multiplier: "amount")
+        deepObj2(amount: Int = 5): [Union] @complexity(cost: 6, multiplier: "amount")
+        deepObj3(amount: Int = 4): [Obj2] @complexity(cost: 6, multiplier: "amount")
       }
 
       type Obj2 {
@@ -892,9 +853,7 @@ describe("Multiple paths", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({

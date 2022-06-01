@@ -1,12 +1,7 @@
-import { ChildComplexity, getChildComplexity } from "./getChildComplexity";
-import { mergeExtra } from "./mergeExtra";
-import {
-  ComplexityEstimator,
-  ComplexityEstimatorArgs,
-  ComplexityNode,
-  Extra,
-} from ".";
-import { nonNullable } from "./utils";
+import { ChildComplexity, getChildComplexity } from './getChildComplexity';
+import { mergeExtra } from './mergeExtra';
+import { ComplexityEstimator, ComplexityEstimatorArgs, ComplexityNode, Extra } from '.';
+import { nonNullable } from './utils';
 
 export const runEstimators = ({
   estimators,
@@ -34,7 +29,7 @@ export const runEstimators = ({
       continue;
     }
 
-    if ("extra" in estimatorValues) {
+    if ('extra' in estimatorValues) {
       thisExtra = estimatorValues.extra; // TODO Merge this?!
     }
 
@@ -42,18 +37,14 @@ export const runEstimators = ({
      * Multiplier is set to the highest of all values if more are given
      */
     if (
-      "multiplier" in estimatorValues &&
+      'multiplier' in estimatorValues &&
       estimatorValues.multiplier !== null &&
       (multiplier === null || estimatorValues.multiplier > multiplier)
     ) {
       multiplier = estimatorValues.multiplier;
     }
 
-    if (
-      "cost" in estimatorValues &&
-      typeof estimatorValues.cost === "number" &&
-      !isNaN(estimatorValues.cost)
-    ) {
+    if ('cost' in estimatorValues && typeof estimatorValues.cost === 'number' && !isNaN(estimatorValues.cost)) {
       thisCost = thisCost + estimatorValues.cost;
     }
   }
@@ -63,10 +54,8 @@ export const runEstimators = ({
   const cost = thisCost + childComplexity.childComplexity * (multiplier || 1);
 
   const allExtras = [thisExtra, childComplexity.extra].filter(nonNullable);
-  const multipliedExtras = [...Array(multiplier || 1)]
-    .map((_) => allExtras)
-    .flat();
-  const extra = mergeExtra("sum", ...multipliedExtras);
+  const multipliedExtras = [...Array(multiplier || 1)].map((_) => allExtras).flat();
+  const extra = mergeExtra('sum', ...multipliedExtras);
 
   return { thisCost, multiplier, cost, extra, childComplexity };
 };

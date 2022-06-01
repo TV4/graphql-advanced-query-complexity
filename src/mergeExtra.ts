@@ -1,10 +1,8 @@
-import { deepmergeCustom } from "deepmerge-ts";
-import { Extra } from ".";
+import { deepmergeCustom } from 'deepmerge-ts';
+import { Extra } from '.';
 
-const areAllNumbers = (
-  values: ReadonlyArray<unknown>
-): values is ReadonlyArray<number> =>
-  values.every((value) => typeof value === "number");
+const areAllNumbers = (values: ReadonlyArray<unknown>): values is ReadonlyArray<number> =>
+  values.every((value) => typeof value === 'number');
 
 const customMerge = (valueMergeStrategy: ValueMergeStrategy) =>
   deepmergeCustom({
@@ -13,13 +11,13 @@ const customMerge = (valueMergeStrategy: ValueMergeStrategy) =>
         const numbers: ReadonlyArray<number> = values;
         const { key } = meta;
 
-        if (key === "mergeValue") {
+        if (key === 'mergeValue') {
           // TODO, rename mergeValue to 'value'
-          if (valueMergeStrategy === "sum") {
+          if (valueMergeStrategy === 'sum') {
             return numbers.reduce((sum, value) => sum + value);
           }
 
-          if (valueMergeStrategy === "max") {
+          if (valueMergeStrategy === 'max') {
             return Math.max(...numbers);
           }
         }
@@ -29,12 +27,9 @@ const customMerge = (valueMergeStrategy: ValueMergeStrategy) =>
     },
   });
 
-type ValueMergeStrategy = "max" | "sum";
+type ValueMergeStrategy = 'max' | 'sum';
 
-export const mergeExtra = (
-  valueMergeStrategy: ValueMergeStrategy,
-  ...extras: Extra[]
-) => {
+export const mergeExtra = (valueMergeStrategy: ValueMergeStrategy, ...extras: Extra[]) => {
   if (!extras.length) {
     return {};
   }

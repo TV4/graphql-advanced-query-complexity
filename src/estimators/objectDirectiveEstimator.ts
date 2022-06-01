@@ -1,12 +1,7 @@
-import { Extra, PublicComplexity } from "..";
-import {
-  getDirectiveValues,
-  getNamedType,
-  GraphQLDirective,
-  GraphQLError,
-} from "graphql";
-import { ComplexityEstimator } from "..";
-import { isNumber } from "../utils";
+import { Extra, PublicComplexity } from '..';
+import { getDirectiveValues, getNamedType, GraphQLDirective, GraphQLError } from 'graphql';
+import { ComplexityEstimator } from '..';
+import { isNumber } from '../utils';
 
 export const throwOnMaxCalls = (complexity: PublicComplexity) => {
   const maxCalls = complexity.extra?.maxCalls;
@@ -21,20 +16,15 @@ export const throwOnMaxCalls = (complexity: PublicComplexity) => {
       const mergeValue = maxCalls[key]?.mergeValue;
 
       if (isNumber(maxTimes) && isNumber(mergeValue) && mergeValue > maxTimes) {
-        throw new GraphQLError(
-          `type ${key} may only be queried ${maxTimes} times. Was queried ${mergeValue} times`,
-          {
-            extensions: { complexity: { code: "TYPE_CALLED_TO_MANY_TIMES" } },
-          }
-        );
+        throw new GraphQLError(`type ${key} may only be queried ${maxTimes} times. Was queried ${mergeValue} times`, {
+          extensions: { complexity: { code: 'TYPE_CALLED_TO_MANY_TIMES' } },
+        });
       }
     }
   }
 };
 
-export const objectDirectiveEstimator = (options: {
-  directive: GraphQLDirective;
-}): ComplexityEstimator => {
+export const objectDirectiveEstimator = (options: { directive: GraphQLDirective }): ComplexityEstimator => {
   return (args) => {
     const schemaTypeNode = args.schema.getType(args.fieldTypeName);
 
@@ -42,10 +32,7 @@ export const objectDirectiveEstimator = (options: {
       return;
     }
 
-    const directiveValues = getDirectiveValues(
-      options.directive,
-      schemaTypeNode.astNode
-    );
+    const directiveValues = getDirectiveValues(options.directive, schemaTypeNode.astNode);
 
     // No directive
     if (!directiveValues) {

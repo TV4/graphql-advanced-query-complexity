@@ -1,21 +1,18 @@
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { validateGraphQlDocuments } from "@graphql-tools/utils";
-import gql from "graphql-tag";
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { validateGraphQlDocuments } from '@graphql-tools/utils';
+import gql from 'graphql-tag';
 
 import {
   createComplexityFieldDirective,
   createComplexityFieldDirectiveSDL,
-} from "../directives/complexityFieldDirective";
+} from '../directives/complexityFieldDirective';
 import {
   createComplexityObjectDirective,
   createComplexityObjectDirectiveSDL,
-} from "../directives/complexityObjectDirective";
-import { fieldDirectiveEstimator } from "../estimators/fieldDirectiveEstimator";
-import {
-  objectDirectiveEstimator,
-  throwOnMaxCalls,
-} from "../estimators/objectDirectiveEstimator";
-import { getComplexity } from "..";
+} from '../directives/complexityObjectDirective';
+import { fieldDirectiveEstimator } from '../estimators/fieldDirectiveEstimator';
+import { objectDirectiveEstimator, throwOnMaxCalls } from '../estimators/objectDirectiveEstimator';
+import { getComplexity } from '..';
 
 const estimators = [
   objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
@@ -23,8 +20,8 @@ const estimators = [
   // simpleEstimator({ defaultComplexity: 0 }),
 ];
 
-describe("Max times object called", () => {
-  it("simple object", async () => {
+describe('Max times object called', () => {
+  it('simple object', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -65,9 +62,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -81,7 +76,7 @@ describe("Max times object called", () => {
     expect(complexity.extra?.maxCalls.Obj.mergeValue).toBe(4);
   });
 
-  it("simple object, throwing", async () => {
+  it('simple object, throwing', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -122,9 +117,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const actual = () =>
@@ -135,12 +128,10 @@ describe("Max times object called", () => {
         postChecks: [throwOnMaxCalls], // <-- This is causing it to throw
       });
 
-    expect(actual).toThrow(
-      "type Obj may only be queried 3 times. Was queried 4 times"
-    );
+    expect(actual).toThrow('type Obj may only be queried 3 times. Was queried 4 times');
   });
 
-  it("list", async () => {
+  it('list', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -163,9 +154,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -179,7 +168,7 @@ describe("Max times object called", () => {
     expect(complexity.extra?.maxCalls.Obj.mergeValue).toBe(4);
   });
 
-  it("winning path", async () => {
+  it('winning path', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -237,9 +226,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -253,7 +240,7 @@ describe("Max times object called", () => {
     expect(complexity.extra?.maxCalls.Obj.mergeValue).toBe(12);
   });
 
-  it("multiple objects", async () => {
+  it('multiple objects', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -294,9 +281,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -312,7 +297,7 @@ describe("Max times object called", () => {
     expect(complexity.extra?.maxCalls.Obj2.mergeValue).toBe(2);
   });
 
-  it("fragment", async () => {
+  it('fragment', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -360,9 +345,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
@@ -378,7 +361,7 @@ describe("Max times object called", () => {
     expect(complexity.extra?.maxCalls.Obj2.mergeValue).toBe(2);
   });
 
-  it("objects and lists", async () => {
+  it('objects and lists', async () => {
     const baseSchema = gql`
       ${createComplexityFieldDirectiveSDL()}
       ${createComplexityObjectDirectiveSDL()}
@@ -391,8 +374,7 @@ describe("Max times object called", () => {
 
       type TestObj {
         union(amount: Int = 5): [Union] @complexity(multiplier: "amount")
-        simpleObj(amount: Int = 4): [SimpleObj]
-          @complexity(multiplier: "amount")
+        simpleObj(amount: Int = 4): [SimpleObj] @complexity(multiplier: "amount")
       }
 
       # Will max be called 4 times
@@ -430,9 +412,7 @@ describe("Max times object called", () => {
     `;
 
     const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [
-      { document: query },
-    ]);
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({

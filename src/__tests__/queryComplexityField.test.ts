@@ -12,7 +12,7 @@ import {
 } from "../directives/complexityObjectDirective";
 import { fieldDirectiveEstimator } from "../estimators/fieldDirectiveEstimator";
 import { objectDirectiveEstimator } from "../estimators/objectDirectiveEstimator";
-import { getComplexity } from "../queryComplexity";
+import { getComplexity } from "..";
 
 const estimators = [
   objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),

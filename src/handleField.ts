@@ -20,7 +20,7 @@ import {
   ComplexityNode,
   Extra,
   GetNodeComplexity,
-} from "./queryComplexity";
+} from ".";
 import { runEstimators } from "./runEstimators";
 
 const BUILT_IN_SCALAR_NAMES = ["String", "Int", "Float", "Boolean", "ID"];

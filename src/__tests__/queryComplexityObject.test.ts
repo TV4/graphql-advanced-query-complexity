@@ -15,7 +15,7 @@ import {
   objectDirectiveEstimator,
   throwOnMaxCalls,
 } from "../estimators/objectDirectiveEstimator";
-import { getComplexity } from "../queryComplexity";
+import { getComplexity } from "..";
 
 const estimators = [
   objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
@@ -40,7 +40,7 @@ describe("Max times object called", () => {
         obj4: Obj
       }
 
-      type Obj @typeComplexity(maxTimes: 3) {
+      type Obj @objComplexity(maxTimes: 3) {
         string: String
       }
     `;
@@ -97,7 +97,7 @@ describe("Max times object called", () => {
         obj4: Obj
       }
 
-      type Obj @typeComplexity(maxTimes: 3) {
+      type Obj @objComplexity(maxTimes: 3) {
         string: String
       }
     `;
@@ -149,7 +149,7 @@ describe("Max times object called", () => {
         test(limit: Int): [Obj] @complexity(multiplier: "limit")
       }
 
-      type Obj @typeComplexity(maxTimes: 3) {
+      type Obj @objComplexity(maxTimes: 3) {
         string: String
       }
     `;
@@ -190,7 +190,7 @@ describe("Max times object called", () => {
 
       union Main = Winning | Losing
 
-      type Obj @typeComplexity(maxTimes: 10) {
+      type Obj @objComplexity(maxTimes: 10) {
         string: String
       }
 
@@ -268,11 +268,11 @@ describe("Max times object called", () => {
         obj3: Obj2
       }
 
-      type Obj1 @typeComplexity(maxTimes: 3) {
+      type Obj1 @objComplexity(maxTimes: 3) {
         string: String
       }
 
-      type Obj2 @typeComplexity(maxTimes: 3) {
+      type Obj2 @objComplexity(maxTimes: 3) {
         string: String
       }
     `;
@@ -327,11 +327,11 @@ describe("Max times object called", () => {
         obj3: Obj2
       }
 
-      type Obj1 @typeComplexity(maxTimes: 3) {
+      type Obj1 @objComplexity(maxTimes: 3) {
         string: String
       }
 
-      type Obj2 @typeComplexity(maxTimes: 3) {
+      type Obj2 @objComplexity(maxTimes: 3) {
         string: String
       }
     `;
@@ -396,17 +396,17 @@ describe("Max times object called", () => {
       }
 
       # Will max be called 4 times
-      type SimpleObj @typeComplexity(maxTimes: 5) {
+      type SimpleObj @objComplexity(maxTimes: 5) {
         simpleObjStr: String
       }
 
       # Will max be called 5 times. Should fail
-      type unionObj1 @typeComplexity(maxTimes: 4) {
+      type unionObj1 @objComplexity(maxTimes: 4) {
         unionObj1Str: String
       }
 
       # Will max be called 5 times
-      type unionObj2 @typeComplexity(maxTimes: 10) {
+      type unionObj2 @objComplexity(maxTimes: 10) {
         unionObj2Str: String
       }
     `;

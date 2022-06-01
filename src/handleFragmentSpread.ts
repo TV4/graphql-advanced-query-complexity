@@ -8,9 +8,9 @@ import {
   GraphQLDirective,
   isCompositeType,
   GraphQLSchema,
-} from 'graphql';
-import { getChildComplexity } from './getChildComplexity';
-import { ComplexityEstimator, ComplexityNode, GetNodeComplexity } from './queryComplexity';
+} from "graphql";
+import { getChildComplexity } from "./getChildComplexity";
+import { ComplexityEstimator, ComplexityNode, GetNodeComplexity } from ".";
 
 export const handleFragmentSpread = (
   childNode: FragmentSpreadNode,
@@ -29,10 +29,14 @@ export const handleFragmentSpread = (
   if (!fragment) {
     throw new Error(`Unknown fragment ${childNode.name.value}`);
   }
-  const fragmentType = validationContext.getSchema().getType(fragment.typeCondition.name.value);
+  const fragmentType = validationContext
+    .getSchema()
+    .getType(fragment.typeCondition.name.value);
   // Invalid fragment type, ignore. Should be caught by other validation rules
   if (!isCompositeType(fragmentType)) {
-    throw new Error(`${fragment.typeCondition.name.value} is not a composite type`);
+    throw new Error(
+      `${fragment.typeCondition.name.value} is not a composite type`
+    );
   }
 
   const children = getNodeComplexity(

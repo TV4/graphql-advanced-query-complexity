@@ -5,7 +5,7 @@ import {
   ComplexityEstimatorArgs,
   ComplexityNode,
   Extra,
-} from "./queryComplexity";
+} from ".";
 import { nonNullable } from "./utils";
 
 export const runEstimators = ({

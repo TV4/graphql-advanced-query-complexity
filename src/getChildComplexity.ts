@@ -1,6 +1,6 @@
 import { mergeExtra } from "./mergeExtra";
 import { nonNullable } from "./utils";
-import { ComplexityNode, Extra } from "./queryComplexity";
+import { ComplexityNode, Extra } from ".";
 
 export type GetChildComplexity = (
   children: ComplexityNode[] | null

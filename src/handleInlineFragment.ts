@@ -9,10 +9,15 @@ import {
   InlineFragmentNode,
   isCompositeType,
   ValidationContext,
-} from 'graphql';
+} from "graphql";
 
-import { ComplexityEstimator, ComplexityEstimatorArgs, ComplexityNode, GetNodeComplexity } from './queryComplexity';
-import { runEstimators } from './runEstimators';
+import {
+  ComplexityEstimator,
+  ComplexityEstimatorArgs,
+  ComplexityNode,
+  GetNodeComplexity,
+} from ".";
+import { runEstimators } from "./runEstimators";
 
 export const handleInlineFragment = (
   childNode: InlineFragmentNode,
@@ -28,16 +33,22 @@ export const handleInlineFragment = (
 ): ComplexityNode => {
   let inlineFragmentType: GraphQLNamedType = typeDef;
   if (childNode.typeCondition && childNode.typeCondition.name) {
-    inlineFragmentType = validationContext.getSchema().getType(childNode.typeCondition.name.value)!;
+    inlineFragmentType = validationContext
+      .getSchema()
+      .getType(childNode.typeCondition.name.value)!;
     if (!isCompositeType(inlineFragmentType)) {
-      throw new Error(`${childNode.typeCondition.name.value} is not a composite type`);
+      throw new Error(
+        `${childNode.typeCondition.name.value} is not a composite type`
+      );
     }
   }
 
   const fieldTypeName = childNode.typeCondition?.name?.value;
 
   if (!fieldTypeName) {
-    throw new Error('fieldTypeName does not exist, this should not be able to happen');
+    throw new Error(
+      "fieldTypeName does not exist, this should not be able to happen"
+    );
   }
   const estimatorArgs: ComplexityEstimatorArgs = {
     args: {},

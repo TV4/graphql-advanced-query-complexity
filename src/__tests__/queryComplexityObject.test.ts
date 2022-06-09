@@ -1,18 +1,18 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
-import { fieldDirectiveEstimator } from '../estimators/fieldDirectiveEstimator';
-import { objectDirectiveEstimator, throwOnMaxCalls } from '../estimators/objectDirectiveEstimator';
+import { fieldDirectiveCalculator } from '../calculators/fieldDirectiveCalculator';
+import { objectDirectiveCalculator, throwOnMaxCalls } from '../calculators/objectDirectiveCalculator';
 import { getComplexity } from '..';
 import { createSDLFromDirective, createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
 
 const objectDirectiveSDL = createSDLFromDirective(createComplexityObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createComplexityFieldDirective());
 
-const estimators = [
-  objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
-  fieldDirectiveEstimator({ directive: createComplexityFieldDirective() }),
-  // simpleEstimator({ defaultComplexity: 0 }),
+const calculators = [
+  objectDirectiveCalculator({ directive: createComplexityObjectDirective() }),
+  fieldDirectiveCalculator({ directive: createComplexityFieldDirective() }),
+  // simpleCalculator({ defaultComplexity: 0 }),
 ];
 
 describe('Max times object called', () => {
@@ -61,7 +61,7 @@ describe('Max times object called', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -117,7 +117,7 @@ describe('Max times object called', () => {
 
     const actual = () =>
       getComplexity({
-        estimators,
+        calculators,
         schema,
         query,
         postChecks: [throwOnMaxCalls], // <-- This is causing it to throw
@@ -132,7 +132,7 @@ describe('Max times object called', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test(limit: Int): [Obj] @advComplexity(multiplier: "limit")
+        test(limit: Int): [Obj] @complexity(multiplier: "limit")
       }
 
       type Obj @objComplexity(maxTimes: 3) {
@@ -153,7 +153,7 @@ describe('Max times object called', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -169,7 +169,7 @@ describe('Max times object called', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test(limit: Int): [Main] @advComplexity(multiplier: "limit")
+        test(limit: Int): [Main] @complexity(multiplier: "limit")
       }
 
       union Main = Winning | Losing
@@ -225,7 +225,7 @@ describe('Max times object called', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -280,7 +280,7 @@ describe('Max times object called', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -344,7 +344,7 @@ describe('Max times object called', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -368,8 +368,8 @@ describe('Max times object called', () => {
       union Union = unionObj1 | unionObj2
 
       type TestObj {
-        union(amount: Int = 5): [Union] @advComplexity(multiplier: "amount")
-        simpleObj(amount: Int = 4): [SimpleObj] @advComplexity(multiplier: "amount")
+        union(amount: Int = 5): [Union] @complexity(multiplier: "amount")
+        simpleObj(amount: Int = 4): [SimpleObj] @complexity(multiplier: "amount")
       }
 
       # Will max be called 4 times
@@ -411,7 +411,7 @@ describe('Max times object called', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });

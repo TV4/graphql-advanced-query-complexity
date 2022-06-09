@@ -4,17 +4,17 @@ type TypeComplexityDirectiveOptions = {
   name?: string;
 };
 
-type CustomAdvComplexityOptions = {
+type CustomComplexityOptions = {
   multiplier?: string;
   cost?: number;
   maxTimes?: number;
 };
 
-const DEFAULT_ADV_COMPLEXITY_NAME = 'advComplexity';
+const DEFAULT_COMPLEXITY_NAME = 'complexity';
 
 export const createComplexityFieldDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
   const args: Record<
-    keyof CustomAdvComplexityOptions,
+    keyof CustomComplexityOptions,
     {
       type: GraphQLInputType;
       description: string;
@@ -35,7 +35,7 @@ export const createComplexityFieldDirective = (options?: TypeComplexityDirective
   };
 
   return new GraphQLDirective({
-    name: options?.name || DEFAULT_ADV_COMPLEXITY_NAME,
+    name: options?.name || DEFAULT_COMPLEXITY_NAME,
     description: '',
     locations: [DirectiveLocation.FIELD_DEFINITION],
     args,

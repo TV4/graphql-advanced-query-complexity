@@ -14,8 +14,8 @@ import {
 } from 'graphql';
 
 import { getChildComplexity } from './getChildComplexity';
-import { ComplexityEstimator, ComplexityEstimatorArgs, ComplexityNode, Extra, GetNodeComplexity } from '.';
-import { runEstimators } from './runEstimators';
+import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, Extra, GetNodeComplexity } from '.';
+import { runCalculators } from './runCalculators';
 
 const BUILT_IN_SCALAR_NAMES = ['String', 'Int', 'Float', 'Boolean', 'ID'];
 const isBuiltInScalar = (typeName: string) => BUILT_IN_SCALAR_NAMES.includes(typeName);
@@ -29,7 +29,7 @@ export const handleField = (
   includeDirectiveDef: GraphQLDirective,
   skipDirectiveDef: GraphQLDirective,
   getNodeComplexity: GetNodeComplexity,
-  estimators: Array<ComplexityEstimator>,
+  calculators: Array<ComplexityCalculator>,
   schema: GraphQLSchema
 ): ComplexityNode | null => {
   const field = fields[childNode.name.value];
@@ -48,7 +48,7 @@ export const handleField = (
       throw new Error(`Could not find type ${fieldTypeName} in schema`);
     }
   } else {
-    //console.log('Run type directives estimators here!', schemaTypeNode);
+    //console.log('Run type directives calculators here!', schemaTypeNode);
   }
 
   // Get arguments
@@ -68,14 +68,14 @@ export const handleField = (
         includeDirectiveDef,
         skipDirectiveDef,
         variableValues,
-        estimators,
+        calculators,
         schema
       )
     : [];
 
   const name = `field_${childNode.name.value}`;
 
-  const estimatorArgs: ComplexityEstimatorArgs = {
+  const calculatorArgs: ComplexityCalculatorArgs = {
     fieldTypeName,
     args,
     field,
@@ -84,9 +84,9 @@ export const handleField = (
     schema,
   };
 
-  const { multiplier, thisCost, cost, childComplexity, extra } = runEstimators({
-    estimatorArgs,
-    estimators,
+  const { multiplier, thisCost, cost, childComplexity, extra } = runCalculators({
+    calculatorArgs,
+    calculators,
     children,
   });
 

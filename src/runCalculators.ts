@@ -1,15 +1,15 @@
 import { ChildComplexity, getChildComplexity } from './getChildComplexity';
 import { mergeExtra } from './mergeExtra';
-import { ComplexityEstimator, ComplexityEstimatorArgs, ComplexityNode, Extra } from '.';
+import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, Extra } from '.';
 import { nonNullable } from './utils';
 
-export const runEstimators = ({
-  estimators,
-  estimatorArgs,
+export const runCalculators = ({
+  calculators,
+  calculatorArgs,
   children,
 }: {
-  estimators: ComplexityEstimator[];
-  estimatorArgs: ComplexityEstimatorArgs;
+  calculators: ComplexityCalculator[];
+  calculatorArgs: ComplexityCalculatorArgs;
   children: ComplexityNode[] | null;
 }): {
   thisCost: number;
@@ -22,18 +22,18 @@ export const runEstimators = ({
   let multiplier: number | null = null;
   let thisExtra: Extra | undefined = undefined;
 
-  for (const estimator of estimators) {
-    const estimatorValues = estimator(estimatorArgs);
+  for (const calculator of calculators) {
+    const calculatorValues = calculator(calculatorArgs);
 
-    if (!estimatorValues) {
+    if (!calculatorValues) {
       continue;
     }
 
-    if ('extra' in estimatorValues) {
+    if ('extra' in calculatorValues) {
       if (thisExtra) {
-        thisExtra = mergeExtra('max', estimatorValues.extra, thisExtra);
+        thisExtra = mergeExtra('max', calculatorValues.extra, thisExtra);
       } else {
-        thisExtra = estimatorValues.extra;
+        thisExtra = calculatorValues.extra;
       }
     }
 
@@ -41,15 +41,15 @@ export const runEstimators = ({
      * Multiplier is set to the highest of all values if more are given
      */
     if (
-      'multiplier' in estimatorValues &&
-      estimatorValues.multiplier !== null &&
-      (multiplier === null || estimatorValues.multiplier > multiplier)
+      'multiplier' in calculatorValues &&
+      calculatorValues.multiplier !== null &&
+      (multiplier === null || calculatorValues.multiplier > multiplier)
     ) {
-      multiplier = estimatorValues.multiplier;
+      multiplier = calculatorValues.multiplier;
     }
 
-    if ('cost' in estimatorValues && typeof estimatorValues.cost === 'number' && !isNaN(estimatorValues.cost)) {
-      thisCost = thisCost + estimatorValues.cost;
+    if ('cost' in calculatorValues && typeof calculatorValues.cost === 'number' && !isNaN(calculatorValues.cost)) {
+      thisCost = thisCost + calculatorValues.cost;
     }
   }
 

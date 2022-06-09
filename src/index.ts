@@ -40,7 +40,7 @@ export type ComplexityNode = {
   extra?: Extra;
 };
 
-export type ComplexityEstimatorArgs = {
+export type ComplexityCalculatorArgs = {
   fieldTypeName: string;
   type: GraphQLCompositeType;
   field?: GraphQLField<any, any>;
@@ -51,11 +51,11 @@ export type ComplexityEstimatorArgs = {
 
 export type Extra = Record<string, any>;
 
-export type ComplexityEstimator = (
-  options: ComplexityEstimatorArgs
+export type ComplexityCalculator = (
+  options: ComplexityCalculatorArgs
 ) => { cost: number; multiplier: number | null } | { extra: Extra } | void;
 
-// Complexity can be anything that is supported by the configured estimators
+// Complexity can be anything that is supported by the configured calculators
 export type Complexity = any;
 
 export interface QueryComplexityOptions {
@@ -77,8 +77,8 @@ export interface QueryComplexityOptions {
   // Optional function to create a custom error
   createError?: (max: number, actual: number) => GraphQLError;
 
-  // An array of complexity estimators to use for estimating the complexity
-  estimators: Array<ComplexityEstimator>;
+  // An array of complexity calculators to use for calculating the complexity
+  calculators: Array<ComplexityCalculator>;
 }
 
 function queryComplexityMessage(max: number, actual: number): string {
@@ -88,7 +88,7 @@ function queryComplexityMessage(max: number, actual: number): string {
 export type ComplexityPostCheck = (complexity: PublicComplexity) => void;
 
 export function getComplexity(options: {
-  estimators: ComplexityEstimator[];
+  calculators: ComplexityCalculator[];
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
@@ -102,7 +102,7 @@ export function getComplexity(options: {
   const visitor = new QueryComplexity(context, {
     // Maximum complexity does not matter since we're only interested in the calculated complexity.
     maximumComplexity: Infinity,
-    estimators: options.estimators,
+    calculators: options.calculators,
     variables: options.variables,
     operationName: options.operationName,
   });
@@ -158,7 +158,7 @@ export type GetNodeComplexity = (
   includeDirectiveDef: GraphQLDirective,
   skipDirectiveDef: GraphQLDirective,
   variableValues: Record<string, any>,
-  estimators: Array<ComplexityEstimator>,
+  calculators: Array<ComplexityCalculator>,
   schema: GraphQLSchema
 ) => ComplexityNode[] | null;
 
@@ -169,7 +169,7 @@ const getChilds: GetNodeComplexity = (
   includeDirectiveDef,
   skipDirectiveDef,
   variableValues,
-  estimators,
+  calculators,
   schema
 ) => {
   let fields: GraphQLFieldMap<any, any> = {};
@@ -198,7 +198,7 @@ const getChilds: GetNodeComplexity = (
             includeDirectiveDef,
             skipDirectiveDef,
             getChilds,
-            estimators,
+            calculators,
             schema
           );
         }
@@ -212,7 +212,7 @@ const getChilds: GetNodeComplexity = (
             includeDirectiveDef,
             skipDirectiveDef,
             getChilds,
-            estimators,
+            calculators,
             schema
           );
         }
@@ -226,7 +226,7 @@ const getChilds: GetNodeComplexity = (
             includeDirectiveDef,
             skipDirectiveDef,
             getChilds,
-            estimators,
+            calculators,
             schema
           );
         }
@@ -251,7 +251,7 @@ class QueryComplexity {
   complexity: PublicComplexity;
   options: QueryComplexityOptions;
   OperationDefinition: Record<string, any>;
-  estimators: Array<ComplexityEstimator>;
+  calculators: Array<ComplexityCalculator>;
   includeDirectiveDef: GraphQLDirective;
   skipDirectiveDef: GraphQLDirective;
   variableValues: Record<string, any>;
@@ -267,7 +267,7 @@ class QueryComplexity {
 
     this.includeDirectiveDef = this.context.getSchema().getDirective('include')!;
     this.skipDirectiveDef = this.context.getSchema().getDirective('skip')!;
-    this.estimators = options.estimators;
+    this.calculators = options.calculators;
     this.variableValues = {};
 
     this.OperationDefinition = {
@@ -299,7 +299,7 @@ class QueryComplexity {
           this.includeDirectiveDef,
           this.skipDirectiveDef,
           this.variableValues,
-          this.estimators,
+          this.calculators,
           this.context.getSchema()
         );
 

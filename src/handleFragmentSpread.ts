@@ -10,7 +10,7 @@ import {
   GraphQLSchema,
 } from 'graphql';
 import { getChildComplexity } from './getChildComplexity';
-import { ComplexityEstimator, ComplexityNode, GetNodeComplexity } from '.';
+import { ComplexityCalculator, ComplexityNode, GetNodeComplexity } from '.';
 
 export const handleFragmentSpread = (
   childNode: FragmentSpreadNode,
@@ -21,7 +21,7 @@ export const handleFragmentSpread = (
   includeDirectiveDef: GraphQLDirective,
   skipDirectiveDef: GraphQLDirective,
   getNodeComplexity: GetNodeComplexity,
-  estimators: Array<ComplexityEstimator>,
+  calculators: Array<ComplexityCalculator>,
   schema: GraphQLSchema
 ): ComplexityNode | null => {
   const fragment = validationContext.getFragment(childNode.name.value);
@@ -42,7 +42,7 @@ export const handleFragmentSpread = (
     includeDirectiveDef,
     skipDirectiveDef,
     variableValues,
-    estimators,
+    calculators,
     schema
   );
 

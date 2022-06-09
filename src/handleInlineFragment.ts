@@ -11,8 +11,8 @@ import {
   ValidationContext,
 } from 'graphql';
 
-import { ComplexityEstimator, ComplexityEstimatorArgs, ComplexityNode, GetNodeComplexity } from '.';
-import { runEstimators } from './runEstimators';
+import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, GetNodeComplexity } from '.';
+import { runCalculators } from './runCalculators';
 
 export const handleInlineFragment = (
   childNode: InlineFragmentNode,
@@ -23,7 +23,7 @@ export const handleInlineFragment = (
   includeDirectiveDef: GraphQLDirective,
   skipDirectiveDef: GraphQLDirective,
   getNodeComplexity: GetNodeComplexity,
-  estimators: Array<ComplexityEstimator>,
+  calculators: Array<ComplexityCalculator>,
   schema: GraphQLSchema
 ): ComplexityNode => {
   let inlineFragmentType: GraphQLNamedType = typeDef;
@@ -39,7 +39,7 @@ export const handleInlineFragment = (
   if (!fieldTypeName) {
     throw new Error('fieldTypeName does not exist, this should not be able to happen');
   }
-  const estimatorArgs: ComplexityEstimatorArgs = {
+  const calculatorArgs: ComplexityCalculatorArgs = {
     args: {},
     fieldTypeName: fieldTypeName,
     node: childNode,
@@ -54,13 +54,13 @@ export const handleInlineFragment = (
     includeDirectiveDef,
     skipDirectiveDef,
     variableValues,
-    estimators,
+    calculators,
     schema
   );
 
-  const { multiplier, cost, extra, childComplexity } = runEstimators({
-    estimatorArgs,
-    estimators,
+  const { multiplier, cost, extra, childComplexity } = runCalculators({
+    calculatorArgs,
+    calculators,
     children,
   });
 

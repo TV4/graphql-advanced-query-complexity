@@ -1,6 +1,6 @@
 import { Extra, PublicComplexity } from '..';
 import { getDirectiveValues, getNamedType, GraphQLDirective, GraphQLError } from 'graphql';
-import { ComplexityEstimator } from '..';
+import { ComplexityCalculator } from '..';
 import { isNumber } from '../utils';
 
 export const throwOnMaxCalls = (complexity: PublicComplexity) => {
@@ -29,7 +29,7 @@ export const throwOnMaxCalls = (complexity: PublicComplexity) => {
   }
 };
 
-export const objectDirectiveEstimator = (options: { directive: GraphQLDirective }): ComplexityEstimator => {
+export const objectDirectiveCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
   return (args) => {
     const schemaTypeNode = args.schema.getType(args.fieldTypeName);
 

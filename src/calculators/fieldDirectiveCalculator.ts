@@ -1,12 +1,12 @@
 import { getDirectiveValues, GraphQLDirective } from 'graphql';
-import { ComplexityEstimator, Extra } from '..';
+import { ComplexityCalculator, Extra } from '..';
 import { isNumber, isString } from '../utils';
 
 const getDeep = <T>(obj: Record<any, any>, path: string): T | null => {
   return (path.split('.').reduce((acc, part) => acc && acc[part], obj) || null) as T | null;
 };
 
-export const fieldDirectiveEstimator = (options: { directive: GraphQLDirective }): ComplexityEstimator => {
+export const fieldDirectiveCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
   return (args) => {
     if (!args.field?.astNode) {
       return;

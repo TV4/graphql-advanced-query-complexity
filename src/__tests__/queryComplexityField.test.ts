@@ -2,17 +2,17 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
 import { createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
-import { fieldDirectiveEstimator } from '../estimators/fieldDirectiveEstimator';
-import { objectDirectiveEstimator } from '../estimators/objectDirectiveEstimator';
+import { fieldDirectiveCalculator } from '../calculators/fieldDirectiveCalculator';
+import { objectDirectiveCalculator } from '../calculators/objectDirectiveCalculator';
 import { getComplexity } from '..';
 import { createSDLFromDirective } from '../directives';
 
 const objectDirectiveSDL = createSDLFromDirective(createComplexityObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createComplexityFieldDirective());
 
-const estimators = [
-  objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
-  fieldDirectiveEstimator({ directive: createComplexityFieldDirective() }),
+const calculators = [
+  objectDirectiveCalculator({ directive: createComplexityObjectDirective() }),
+  fieldDirectiveCalculator({ directive: createComplexityFieldDirective() }),
 ];
 
 describe('Basics', () => {
@@ -22,7 +22,7 @@ describe('Basics', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: String @advComplexity(cost: 7)
+        test: String @complexity(cost: 7)
       }
     `;
 
@@ -37,7 +37,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -51,7 +51,7 @@ describe('Basics', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: Enum @advComplexity(cost: 7)
+        test: Enum @complexity(cost: 7)
       }
 
       enum Enum {
@@ -71,7 +71,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -89,8 +89,8 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @advComplexity(cost: 1)
-        number: Int @advComplexity(cost: 7)
+        string: String @complexity(cost: 1)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -108,7 +108,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -122,12 +122,12 @@ describe('Basics', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: Obj @advComplexity(cost: 2)
+        test: Obj @complexity(cost: 2)
       }
 
       type Obj {
-        string: String @advComplexity(cost: 1)
-        number: Int @advComplexity(cost: 7)
+        string: String @complexity(cost: 1)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -145,7 +145,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -165,11 +165,11 @@ describe('Basics', () => {
       union Union = Obj1 | Obj2
 
       type Obj1 {
-        string: String @advComplexity(cost: 1)
+        string: String @complexity(cost: 1)
       }
 
       type Obj2 {
-        number: Int @advComplexity(cost: 7)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -191,7 +191,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -206,17 +206,17 @@ describe('Basics', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: Union @advComplexity(cost: 2)
+        test: Union @complexity(cost: 2)
       }
 
       union Union = Obj1 | Obj2
 
       type Obj1 {
-        string: String @advComplexity(cost: 1)
+        string: String @complexity(cost: 1)
       }
 
       type Obj2 {
-        number: Int @advComplexity(cost: 7)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -238,7 +238,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -261,12 +261,12 @@ describe('Basics', () => {
       }
 
       type Impl1 implements Interface {
-        string: String @advComplexity(cost: 1)
+        string: String @complexity(cost: 1)
       }
 
       type Impl2 implements Interface {
-        string: String @advComplexity(cost: 7)
-        number: Int @advComplexity(cost: 2)
+        string: String @complexity(cost: 7)
+        number: Int @complexity(cost: 2)
       }
     `;
 
@@ -289,7 +289,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -304,7 +304,7 @@ describe('Basics', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: Interface @advComplexity(cost: 3)
+        test: Interface @complexity(cost: 3)
       }
 
       interface Interface {
@@ -312,13 +312,13 @@ describe('Basics', () => {
       }
 
       type Impl1 implements Interface {
-        string: String @advComplexity(cost: 1)
+        string: String @complexity(cost: 1)
       }
 
       type Impl2 implements Interface {
-        string: String @advComplexity(cost: 7)
-        number: Int @advComplexity(cost: 2)
-        interface: ImplInterface2 @advComplexity(cost: 3)
+        string: String @complexity(cost: 7)
+        number: Int @complexity(cost: 2)
+        interface: ImplInterface2 @complexity(cost: 3)
       }
 
       interface Interface2 {
@@ -326,7 +326,7 @@ describe('Basics', () => {
       }
 
       type ImplInterface2 implements Interface2 {
-        number: Int @advComplexity(cost: 5)
+        number: Int @complexity(cost: 5)
       }
     `;
 
@@ -352,7 +352,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -371,7 +371,7 @@ describe('Basics', () => {
       }
 
       interface Interface {
-        string: String @advComplexity(cost: 1)
+        string: String @complexity(cost: 1)
       }
 
       type Impl1 implements Interface {
@@ -403,7 +403,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -422,13 +422,13 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @advComplexity(cost: 2)
-        obj2: Obj2 @advComplexity(cost: 5)
+        string: String @complexity(cost: 2)
+        obj2: Obj2 @complexity(cost: 5)
       }
 
       type Obj2 {
-        number: String @advComplexity(cost: 1)
-        string: String @advComplexity(cost: 6)
+        number: String @complexity(cost: 1)
+        string: String @complexity(cost: 6)
       }
     `;
 
@@ -449,7 +449,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -467,26 +467,26 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @advComplexity(cost: 2)
-        obj2: Obj2 @advComplexity(cost: 5)
+        string: String @complexity(cost: 2)
+        obj2: Obj2 @complexity(cost: 5)
         union: Union
       }
 
       type Obj2 {
-        number: String @advComplexity(cost: 1)
-        string: String @advComplexity(cost: 6)
+        number: String @complexity(cost: 1)
+        string: String @complexity(cost: 6)
       }
 
       union Union = Obj3 | Obj4
 
       type Obj3 {
-        number: String @advComplexity(cost: 2)
-        string: String @advComplexity(cost: 3)
+        number: String @complexity(cost: 2)
+        string: String @complexity(cost: 3)
       }
 
       type Obj4 {
-        number: String @advComplexity(cost: 4)
-        string: String @advComplexity(cost: 7)
+        number: String @complexity(cost: 4)
+        string: String @complexity(cost: 7)
       }
     `;
 
@@ -517,7 +517,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -535,8 +535,8 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @advComplexity(cost: 1)
-        number: Int @advComplexity(cost: 7)
+        string: String @complexity(cost: 1)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -558,7 +558,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -574,12 +574,12 @@ describe('Basics', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: Obj @advComplexity(cost: 2)
+        test: Obj @complexity(cost: 2)
       }
 
       type Obj {
-        string: String @advComplexity(cost: 1)
-        number: Int @advComplexity(cost: 7)
+        string: String @complexity(cost: 1)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -601,7 +601,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -617,7 +617,7 @@ describe('Basics', () => {
       scalar Scalar
 
       type Query {
-        test: Scalar @advComplexity(cost: 7)
+        test: Scalar @complexity(cost: 7)
       }
     `;
 
@@ -632,7 +632,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -650,8 +650,8 @@ describe('Basics', () => {
       }
 
       type Obj {
-        string: String @advComplexity(cost: 1)
-        number: Int @advComplexity(cost: 7)
+        string: String @complexity(cost: 1)
+        number: Int @complexity(cost: 7)
       }
     `;
 
@@ -669,7 +669,7 @@ describe('Basics', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -685,7 +685,7 @@ describe('Lists', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: [String] @advComplexity(cost: 7)
+        test: [String] @complexity(cost: 7)
       }
     `;
 
@@ -700,7 +700,7 @@ describe('Lists', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -714,7 +714,7 @@ describe('Lists', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test(limit: Int): [String] @advComplexity(cost: 7, multiplier: "limit")
+        test(limit: Int): [String] @complexity(cost: 7, multiplier: "limit")
       }
     `;
 
@@ -735,7 +735,7 @@ describe('Lists', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -749,15 +749,15 @@ describe('Lists', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test(limit: Int): [Obj] @advComplexity(cost: 7, multiplier: "limit")
+        test(limit: Int): [Obj] @complexity(cost: 7, multiplier: "limit")
       }
 
       type Obj {
-        deepObj(amount: Int = 5): [Obj2] @advComplexity(cost: 6, multiplier: "amount")
+        deepObj(amount: Int = 5): [Obj2] @complexity(cost: 6, multiplier: "amount")
       }
 
       type Obj2 {
-        string: String @advComplexity(cost: 2)
+        string: String @complexity(cost: 2)
       }
     `;
 
@@ -782,7 +782,7 @@ describe('Lists', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -798,26 +798,26 @@ describe('Multiple paths', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test: Obj @advComplexity(cost: 2)
+        test: Obj @complexity(cost: 2)
       }
 
       union Union = Obj3 | Obj4
 
       type Obj {
-        deepObj2(amount: Int = 5): [Union] @advComplexity(cost: 6, multiplier: "amount")
-        deepObj3(amount: Int = 4): [Obj2] @advComplexity(cost: 6, multiplier: "amount")
+        deepObj2(amount: Int = 5): [Union] @complexity(cost: 6, multiplier: "amount")
+        deepObj3(amount: Int = 4): [Obj2] @complexity(cost: 6, multiplier: "amount")
       }
 
       type Obj2 {
-        string: String @advComplexity(cost: 2)
+        string: String @complexity(cost: 2)
       }
 
       type Obj3 {
-        string: String @advComplexity(cost: 2)
+        string: String @complexity(cost: 2)
       }
 
       type Obj4 {
-        string: String @advComplexity(cost: 7)
+        string: String @complexity(cost: 7)
       }
     `;
 
@@ -853,7 +853,7 @@ describe('Multiple paths', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });
@@ -869,7 +869,7 @@ describe('maxItems on field', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test(amount: Int = 5): [Obj] @advComplexity(multiplier: "amount", maxTimes: 3)
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", maxTimes: 3)
       }
 
       type Obj {
@@ -890,7 +890,7 @@ describe('maxItems on field', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      estimators,
+      calculators,
       schema,
       query,
     });

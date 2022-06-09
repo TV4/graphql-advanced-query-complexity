@@ -1,18 +1,13 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
-
-import {
-  createComplexityFieldDirective,
-  createComplexityFieldDirectiveSDL,
-} from '../directives/complexityFieldDirective';
-import {
-  createComplexityObjectDirective,
-  createComplexityObjectDirectiveSDL,
-} from '../directives/complexityObjectDirective';
 import { fieldDirectiveEstimator } from '../estimators/fieldDirectiveEstimator';
 import { objectDirectiveEstimator, throwOnMaxCalls } from '../estimators/objectDirectiveEstimator';
 import { getComplexity } from '..';
+import { createSDLFromDirective, createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
+
+const objectDirectiveSDL = createSDLFromDirective(createComplexityObjectDirective());
+const fieldDirectiveSDL = createSDLFromDirective(createComplexityFieldDirective());
 
 const estimators = [
   objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
@@ -23,8 +18,8 @@ const estimators = [
 describe('Max times object called', () => {
   it('simple object', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Main
@@ -78,8 +73,8 @@ describe('Max times object called', () => {
 
   it('simple object, throwing', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Main
@@ -133,8 +128,8 @@ describe('Max times object called', () => {
 
   it('list', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test(limit: Int): [Obj] @advComplexity(multiplier: "limit")
@@ -170,8 +165,8 @@ describe('Max times object called', () => {
 
   it('winning path', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test(limit: Int): [Main] @advComplexity(multiplier: "limit")
@@ -242,8 +237,8 @@ describe('Max times object called', () => {
 
   it('multiple objects', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Main
@@ -299,8 +294,8 @@ describe('Max times object called', () => {
 
   it('fragment', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Main
@@ -363,8 +358,8 @@ describe('Max times object called', () => {
 
   it('objects and lists', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: TestObj

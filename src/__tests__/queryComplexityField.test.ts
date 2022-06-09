@@ -1,18 +1,14 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
-
-import {
-  createComplexityFieldDirective,
-  createComplexityFieldDirectiveSDL,
-} from '../directives/complexityFieldDirective';
-import {
-  createComplexityObjectDirective,
-  createComplexityObjectDirectiveSDL,
-} from '../directives/complexityObjectDirective';
+import { createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
 import { fieldDirectiveEstimator } from '../estimators/fieldDirectiveEstimator';
 import { objectDirectiveEstimator } from '../estimators/objectDirectiveEstimator';
 import { getComplexity } from '..';
+import { createSDLFromDirective } from '../directives';
+
+const objectDirectiveSDL = createSDLFromDirective(createComplexityObjectDirective());
+const fieldDirectiveSDL = createSDLFromDirective(createComplexityFieldDirective());
 
 const estimators = [
   objectDirectiveEstimator({ directive: createComplexityObjectDirective() }),
@@ -22,8 +18,8 @@ const estimators = [
 describe('Basics', () => {
   it('string', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: String @advComplexity(cost: 7)
@@ -51,8 +47,8 @@ describe('Basics', () => {
 
   it('enum', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Enum @advComplexity(cost: 7)
@@ -85,8 +81,8 @@ describe('Basics', () => {
 
   it('simple object', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj
@@ -122,8 +118,8 @@ describe('Basics', () => {
 
   it('simple object with multi cost', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj @advComplexity(cost: 2)
@@ -159,8 +155,8 @@ describe('Basics', () => {
 
   it('union', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Union
@@ -206,8 +202,8 @@ describe('Basics', () => {
 
   it('union with multi cost', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Union @advComplexity(cost: 2)
@@ -253,8 +249,8 @@ describe('Basics', () => {
 
   it('interface', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Interface
@@ -304,8 +300,8 @@ describe('Basics', () => {
 
   it('interface with multi cost', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Interface @advComplexity(cost: 3)
@@ -367,8 +363,8 @@ describe('Basics', () => {
 
   it.skip('Not yet implemented interface with cost on interface', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Interface
@@ -418,8 +414,8 @@ describe('Basics', () => {
 
   it('nested object', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj
@@ -463,8 +459,8 @@ describe('Basics', () => {
 
   it('nested object with unions', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj
@@ -531,8 +527,8 @@ describe('Basics', () => {
 
   it('fragment', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj
@@ -574,8 +570,8 @@ describe('Basics', () => {
 
   it('fragment with multi cost', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj @advComplexity(cost: 2)
@@ -615,8 +611,8 @@ describe('Basics', () => {
 
   it('custom scalar', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       scalar Scalar
 
@@ -646,8 +642,8 @@ describe('Basics', () => {
 
   it('skip and include', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj
@@ -685,8 +681,8 @@ describe('Basics', () => {
 describe('Lists', () => {
   it('without multiplier', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: [String] @advComplexity(cost: 7)
@@ -714,8 +710,8 @@ describe('Lists', () => {
 
   it('string with multiplier', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test(limit: Int): [String] @advComplexity(cost: 7, multiplier: "limit")
@@ -749,8 +745,8 @@ describe('Lists', () => {
 
   it('nested multipliers', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test(limit: Int): [Obj] @advComplexity(cost: 7, multiplier: "limit")
@@ -798,8 +794,8 @@ describe('Lists', () => {
 describe('Multiple paths', () => {
   it('objects and lists', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test: Obj @advComplexity(cost: 2)
@@ -869,8 +865,8 @@ describe('Multiple paths', () => {
 describe('maxItems on field', () => {
   it('simple object', async () => {
     const baseSchema = gql`
-      ${createComplexityFieldDirectiveSDL()}
-      ${createComplexityObjectDirectiveSDL()}
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
 
       type Query {
         test(amount: Int = 5): [Obj] @advComplexity(multiplier: "amount", maxTimes: 3)

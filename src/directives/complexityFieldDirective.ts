@@ -1,5 +1,4 @@
-import { astFromDirective } from '@graphql-tools/utils';
-import { DirectiveLocation, GraphQLDirective, GraphQLInputType, GraphQLInt, GraphQLString, print } from 'graphql';
+import { DirectiveLocation, GraphQLDirective, GraphQLInputType, GraphQLInt, GraphQLString } from 'graphql';
 
 type TypeComplexityDirectiveOptions = {
   name?: string;
@@ -12,9 +11,6 @@ type CustomAdvComplexityOptions = {
 };
 
 const DEFAULT_ADV_COMPLEXITY_NAME = 'advComplexity';
-
-export const createComplexityFieldDirectiveSDL = (options?: TypeComplexityDirectiveOptions) =>
-  print(astFromDirective(createComplexityFieldDirective(options)));
 
 export const createComplexityFieldDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
   const args: Record<

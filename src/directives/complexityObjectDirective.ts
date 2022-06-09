@@ -24,9 +24,6 @@ type CustomTypeComplexityOptions = {
   // batchSize?: number;
 };
 
-export const createComplexityObjectDirectiveSDL = (options?: TypeComplexityDirectiveOptions) =>
-  print(astFromDirective(createComplexityObjectDirective(options)));
-
 export const createComplexityObjectDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
   const args: Record<
     keyof CustomTypeComplexityOptions,

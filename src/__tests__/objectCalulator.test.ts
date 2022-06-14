@@ -34,7 +34,7 @@ describe('Max times object called', () => {
         obj4: Obj
       }
 
-      type Obj @objComplexity(maxTimes: 3) {
+      type Obj @objComplexity(max: 3) {
         string: String
       }
     `;
@@ -69,7 +69,7 @@ describe('Max times object called', () => {
     });
 
     expect(complexity.cost).toBe(0);
-    expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['type-Obj'].max).toBe(3);
     expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
   });
 
@@ -82,7 +82,7 @@ describe('Max times object called', () => {
         test(limit: Int): [Obj] @complexity(multiplier: "limit")
       }
 
-      type Obj @objComplexity(maxTimes: 3) {
+      type Obj @objComplexity(max: 3) {
         string: String
       }
     `;
@@ -106,7 +106,7 @@ describe('Max times object called', () => {
     });
 
     expect(complexity.cost).toBe(0);
-    expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['type-Obj'].max).toBe(3);
     expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
   });
 
@@ -121,7 +121,7 @@ describe('Max times object called', () => {
 
       union Main = Winning | Losing
 
-      type Obj @objComplexity(maxTimes: 10) {
+      type Obj @objComplexity(max: 10) {
         string: String
       }
 
@@ -178,7 +178,7 @@ describe('Max times object called', () => {
     });
 
     expect(complexity.cost).toBe(0);
-    expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(10);
+    expect(complexity.extra?.maxCalls['type-Obj'].max).toBe(10);
     expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(12);
   });
 
@@ -197,11 +197,11 @@ describe('Max times object called', () => {
         obj3: Obj2
       }
 
-      type Obj1 @objComplexity(maxTimes: 3) {
+      type Obj1 @objComplexity(max: 3) {
         string: String
       }
 
-      type Obj2 @objComplexity(maxTimes: 3) {
+      type Obj2 @objComplexity(max: 3) {
         string: String
       }
     `;
@@ -233,9 +233,9 @@ describe('Max times object called', () => {
     });
 
     expect(complexity.cost).toBe(0);
-    expect(complexity.extra?.maxCalls['type-Obj1'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['type-Obj1'].max).toBe(3);
     expect(complexity.extra?.maxCalls['type-Obj1'].value).toBe(1);
-    expect(complexity.extra?.maxCalls['type-Obj2'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['type-Obj2'].max).toBe(3);
     expect(complexity.extra?.maxCalls['type-Obj2'].value).toBe(2);
   });
 
@@ -254,11 +254,11 @@ describe('Max times object called', () => {
         obj3: Obj2
       }
 
-      type Obj1 @objComplexity(maxTimes: 3) {
+      type Obj1 @objComplexity(max: 3) {
         string: String
       }
 
-      type Obj2 @objComplexity(maxTimes: 3) {
+      type Obj2 @objComplexity(max: 3) {
         string: String
       }
     `;
@@ -297,9 +297,9 @@ describe('Max times object called', () => {
     });
 
     expect(complexity.cost).toBe(0);
-    expect(complexity.extra?.maxCalls['type-Obj1'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['type-Obj1'].max).toBe(3);
     expect(complexity.extra?.maxCalls['type-Obj1'].value).toBe(1);
-    expect(complexity.extra?.maxCalls['type-Obj2'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['type-Obj2'].max).toBe(3);
     expect(complexity.extra?.maxCalls['type-Obj2'].value).toBe(2);
   });
 
@@ -320,17 +320,17 @@ describe('Max times object called', () => {
       }
 
       # Will max be called 4 times
-      type SimpleObj @objComplexity(maxTimes: 5) {
+      type SimpleObj @objComplexity(max: 5) {
         simpleObjStr: String
       }
 
       # Will max be called 5 times. Should fail
-      type unionObj1 @objComplexity(maxTimes: 4) {
+      type unionObj1 @objComplexity(max: 4) {
         unionObj1Str: String
       }
 
       # Will max be called 5 times
-      type unionObj2 @objComplexity(maxTimes: 10) {
+      type unionObj2 @objComplexity(max: 10) {
         unionObj2Str: String
       }
     `;
@@ -365,13 +365,13 @@ describe('Max times object called', () => {
 
     expect(complexity.cost).toBe(0);
 
-    expect(complexity.extra?.maxCalls['type-SimpleObj'].maxTimes).toBe(5);
+    expect(complexity.extra?.maxCalls['type-SimpleObj'].max).toBe(5);
     expect(complexity.extra?.maxCalls['type-SimpleObj'].value).toBe(4);
 
-    expect(complexity.extra?.maxCalls['type-unionObj1'].maxTimes).toBe(4);
+    expect(complexity.extra?.maxCalls['type-unionObj1'].max).toBe(4);
     expect(complexity.extra?.maxCalls['type-unionObj1'].value).toBe(5);
 
-    expect(complexity.extra?.maxCalls['type-unionObj2'].maxTimes).toBe(10);
+    expect(complexity.extra?.maxCalls['type-unionObj2'].max).toBe(10);
     expect(complexity.extra?.maxCalls['type-unionObj2'].value).toBe(5);
   });
 });

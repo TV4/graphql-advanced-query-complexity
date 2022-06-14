@@ -8,7 +8,7 @@ export type TypeComplexityDirectiveOptions = {
 
 type CustomTypeComplexityOptions = {
   // services?: string[];
-  maxTimes?: number;
+  max?: number;
   // initCost?: number;
   // perItemCost?: number;
   // batchSize?: number;
@@ -22,7 +22,7 @@ export const createObjectDirective = (options?: TypeComplexityDirectiveOptions):
       description: string;
     }
   > = {
-    maxTimes: {
+    max: {
       type: GraphQLInt,
       description: 'Max time this type can be requested in a single query',
     },

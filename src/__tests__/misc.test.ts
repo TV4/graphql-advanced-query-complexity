@@ -21,7 +21,7 @@ it('get tree', async () => {
     ${objectDirectiveSDL}
 
     type Query {
-      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", maxTimes: 3)
+      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", max: 3)
     }
 
     type Obj {

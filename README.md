@@ -15,10 +15,10 @@ Although this package does everything [graphql-query-complexity](https://www.npm
 
 ```gql
 type Query {
-  exampleQuery(amount: Int!): [Obj] @complexity(multiplier: "amount", cost: 10, maxTimes: 1)
+  exampleQuery(amount: Int!): [Obj] @complexity(multiplier: "amount", cost: 10, max: 1)
 }
 
-type Obj @objComplexity(maxTimes: 10) {
+type Obj @objComplexity(max: 10) {
   string: String @complexity(cost: 7)
 }
 ```
@@ -29,11 +29,11 @@ First the `exampleQuery` field:
 
 - `@complexity(multiplier: "amount")`. The `exampleQuery` returns a _list_, the more items it's returning, the more complex will the query be. The `multiplier` directive value is your way of telling the calculators how many items that will (at most) be returned. You most probably want to specify the multiplier on _all_ your lists.
 - `@complexity(cost: 10)`. When you call this field, a cost of 10 will be added to the total cost. This does not take children or the multiplier into account but is the cost for _this_ specicific field.
-- `@complexity(maxTimes: 1)`. The maximum amount of times this field may be queried in a single query.
+- `@complexity(max: 1)`. The maximum amount of times this field may be queried in a single query.
 
 the `Obj` type:
 
-- `@objComplexity(maxTimes: 10)` Notice that this directive is on the _type_! At most this type may be queried for 10 times, no matter _where_ it is used. So in our example, if you were to do query this schema with `exampleQuery(amount: 11)` it would be an error.
+- `@objComplexity(max: 10)` Notice that this directive is on the _type_! At most this type may be queried for 10 times, no matter _where_ it is used. So in our example, if you were to do query this schema with `exampleQuery(amount: 11)` it would be an error.
 - `@complexity(cost: 7)`. Same as the complexity on exampleQuery.
 
 Querying this example schema with the query:
@@ -48,7 +48,7 @@ query {
 
 would return:
 
-- Information about that the maxTimes of `Obj` is passed. It's only allowed 10 times but you're querying for it 11 times.
+- Information about that the max of `Obj` is passed. It's only allowed 10 times but you're querying for it 11 times.
 - Information about the cost which is:
   - `string` requested 11 times at the cost of 7 per time = 77.
   - `exampleQuery` having a cost of 10.
@@ -153,7 +153,7 @@ type Query {
   complexityExample(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
 }
 
-type Obj @objComplexity(maxTimes: 3) {
+type Obj @objComplexity(max: 3) {
   string: String @complexity(cost: 7)
 }
 ```
@@ -180,7 +180,7 @@ As we added a `console.log` statement to our Apollo server plugin this is now pr
   "extra": {
     "maxCalls": {
       "type-Obj": {
-        "maxTimes": 3,
+        "max": 3,
         "value": 4
       }
     }

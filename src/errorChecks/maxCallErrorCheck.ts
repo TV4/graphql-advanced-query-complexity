@@ -14,14 +14,14 @@ export const maxCallErrorCheck: ErrorCheck = (complexity) => {
 
   for (const key in maxCalls) {
     if (Object.prototype.hasOwnProperty.call(maxCalls, key)) {
-      const maxTimes = maxCalls[key]?.maxTimes;
+      const max = maxCalls[key]?.max;
       const value = maxCalls[key]?.value;
 
-      if (isNumber(maxTimes) && isNumber(value) && value > maxTimes) {
+      if (isNumber(max) && isNumber(value) && value > max) {
         const [type, actualKey] = key.split('-');
 
         errors.push(
-          new GraphQLError(`${type} ${actualKey} may only be queried ${maxTimes} times. Was queried ${value} times`, {
+          new GraphQLError(`${type} ${actualKey} may only be queried ${max} times. Was queried ${value} times`, {
             extensions: { complexity: { code: 'TYPE_CALLED_TO_MANY_TIMES' } },
           })
         );

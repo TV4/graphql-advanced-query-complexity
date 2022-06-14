@@ -21,7 +21,7 @@ Object {
   "extra": Object {
     "maxCalls": Object {
       "field-Query:test": Object {
-        "maxTimes": 3,
+        "max": 3,
         "value": 4,
       },
     },

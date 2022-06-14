@@ -1,15 +1,15 @@
 import { GraphQLNamedType, InlineFragmentNode, isCompositeType } from 'graphql';
 
 import { ComplexityCalculatorArgs, ComplexityNode } from '.';
-import { CommonHandle } from './handleTypes';
+import { CommonHandle } from './commonTypes';
 import { runCalculators } from './runCalculators';
 
 export const handleInlineFragment = ({
+  // fields,
   childNode,
   typeDef,
   validationContext,
   variableValues,
-  // fields,
   includeDirectiveDef,
   skipDirectiveDef,
   getNodeComplexity,

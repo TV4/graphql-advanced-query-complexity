@@ -25,7 +25,7 @@ import { getDirectiveValues, getVariableValues } from 'graphql/execution/values'
 import { handleField } from './handleField';
 import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
-import { GetNodeComplexity } from './handleTypes';
+import { GetNodeComplexity } from './commonTypes';
 import { isBoolean, nonNullable } from './utils';
 
 export type ComplexityNode = {
@@ -57,13 +57,9 @@ export type ComplexityCalculator = (
 
 // TODO: Not all of these are used, are they? Fix
 export interface QueryComplexityOptions {
-  // The maximum allowed query complexity, queries above this threshold will be rejected
-  maximumComplexity: number;
-
   // The query variables. This is needed because the variables are not available
   // in the visitor of the graphql-js library
   variables?: Record<string, any>;
-
   // specify operation name only when pass multi-operation documents
   operationName?: string;
   calculators: Array<ComplexityCalculator>;
@@ -86,8 +82,6 @@ export function getComplexity(options: {
     const errors: GraphQLError[] = [];
     const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
     const visitor = new QueryComplexity(context, {
-      // Maximum complexity does not matter since we're only interested in the calculated complexity.
-      maximumComplexity: Infinity,
       calculators: options.calculators,
       variables: options.variables,
       operationName: options.operationName,
@@ -265,10 +259,6 @@ class QueryComplexity {
   variableValues: Record<string, any>;
 
   constructor(context: ValidationContext, options: QueryComplexityOptions) {
-    if (!(typeof options.maximumComplexity === 'number' && options.maximumComplexity > 0)) {
-      throw new Error('Maximum query complexity must be a positive number');
-    }
-
     this.context = context;
     this.complexity = { cost: 0, tree: null };
     this.options = options;

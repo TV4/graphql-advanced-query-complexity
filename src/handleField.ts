@@ -2,7 +2,7 @@ import { getArgumentValues } from '@graphql-tools/utils';
 import { FieldNode, getNamedType, isCompositeType } from 'graphql';
 
 import { ComplexityCalculatorArgs, ComplexityNode } from '.';
-import { CommonHandle } from './handleTypes';
+import { CommonHandle } from './commonTypes';
 import { runCalculators } from './runCalculators';
 
 const BUILT_IN_SCALAR_NAMES = ['String', 'Int', 'Float', 'Boolean', 'ID'];
@@ -37,11 +37,8 @@ export const handleField = ({
       // This should never happen
       throw new Error(`Could not find type ${fieldTypeName} in schema`);
     }
-  } else {
-    //console.log('Run type directives calculators here!', schemaTypeNode);
   }
 
-  // Get arguments
   let args: { [key: string]: any };
   try {
     args = getArgumentValues(field, childNode, variableValues || {});

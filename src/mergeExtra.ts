@@ -12,7 +12,6 @@ const customMerge = (valueMergeStrategy: ValueMergeStrategy) =>
         const { key } = meta;
 
         if (key === 'mergeValue') {
-          // TODO, rename mergeValue to 'value'
           if (valueMergeStrategy === 'sum') {
             return numbers.reduce((sum, value) => sum + value);
           }

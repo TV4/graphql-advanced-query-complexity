@@ -1,3 +1,4 @@
+import { CommonHandle } from './handleTypes';
 import {
   FragmentSpreadNode,
   GraphQLObjectType,
@@ -23,17 +24,8 @@ export const handleFragmentSpread = ({
   getNodeComplexity,
   calculators,
   schema,
-}: {
+}: CommonHandle & {
   childNode: FragmentSpreadNode;
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
-  validationContext: ValidationContext;
-  variableValues: Record<string, any>;
-  fields: GraphQLFieldMap<any, any>;
-  includeDirectiveDef?: GraphQLDirective;
-  skipDirectiveDef?: GraphQLDirective;
-  getNodeComplexity: GetNodeComplexity;
-  calculators: Array<ComplexityCalculator>;
-  schema: GraphQLSchema;
 }): ComplexityNode | null => {
   const fragment = validationContext.getFragment(childNode.name.value);
   // Unknown fragment, should be caught by other validation rules

@@ -1,3 +1,4 @@
+import { CommonHandle } from './handleTypes';
 import {
   GraphQLDirective,
   GraphQLFieldMap,
@@ -19,23 +20,14 @@ export const handleInlineFragment = ({
   typeDef,
   validationContext,
   variableValues,
-  fields,
+  // fields,
   includeDirectiveDef,
   skipDirectiveDef,
   getNodeComplexity,
   calculators,
   schema,
-}: {
+}: CommonHandle & {
   childNode: InlineFragmentNode;
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
-  validationContext: ValidationContext;
-  variableValues: Record<string, any>;
-  fields: GraphQLFieldMap<any, any>;
-  includeDirectiveDef?: GraphQLDirective;
-  skipDirectiveDef?: GraphQLDirective;
-  getNodeComplexity: GetNodeComplexity;
-  calculators: Array<ComplexityCalculator>;
-  schema: GraphQLSchema;
 }): ComplexityNode => {
   let inlineFragmentType: GraphQLNamedType = typeDef;
   if (childNode.typeCondition && childNode.typeCondition.name) {

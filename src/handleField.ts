@@ -1,3 +1,4 @@
+import { CommonHandle } from './handleTypes';
 import { mergeExtra } from './mergeExtra';
 import { getArgumentValues } from '@graphql-tools/utils';
 import {
@@ -31,17 +32,8 @@ export const handleField = ({
   getNodeComplexity,
   calculators,
   schema,
-}: {
+}: CommonHandle & {
   childNode: FieldNode;
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
-  validationContext: ValidationContext;
-  variableValues: Record<string, any>;
-  fields: GraphQLFieldMap<any, any>;
-  includeDirectiveDef?: GraphQLDirective;
-  skipDirectiveDef?: GraphQLDirective;
-  getNodeComplexity: GetNodeComplexity;
-  calculators: Array<ComplexityCalculator>;
-  schema: GraphQLSchema;
 }): ComplexityNode | null => {
   const field = fields[childNode.name.value];
   // Invalid field, should be caught by other validation rules

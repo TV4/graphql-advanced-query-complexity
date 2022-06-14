@@ -19,13 +19,7 @@ export const getChildComplexity: GetChildComplexity = (children) => {
    * If it's a union, then pick the most costly member
    */
   if (children[0].isInlineFragmentType) {
-    // Check Only for development, remove in production
-    if (!children.every((x) => x.isInlineFragmentType)) {
-      throw new Error('Not every child is an inlineFragmentType');
-    }
-
     const sortedChildren = children.sort((a, b) => b.cost - a.cost);
-
     sortedChildren[0].selected = true;
     const childComplexity = sortedChildren[0].cost;
 

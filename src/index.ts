@@ -78,34 +78,45 @@ export function getComplexity(options: {
   variables?: Record<string, any>;
   operationName?: string;
   errorChecks?: ErrorCheck[];
+  throwErrors?: boolean;
 }): Complexity {
-  const typeInfo = new TypeInfo(options.schema);
+  try {
+    const typeInfo = new TypeInfo(options.schema);
 
-  const errors: GraphQLError[] = [];
-  const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
-  const visitor = new QueryComplexity(context, {
-    // Maximum complexity does not matter since we're only interested in the calculated complexity.
-    maximumComplexity: Infinity,
-    calculators: options.calculators,
-    variables: options.variables,
-    operationName: options.operationName,
-  });
+    const errors: GraphQLError[] = [];
+    const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
+    const visitor = new QueryComplexity(context, {
+      // Maximum complexity does not matter since we're only interested in the calculated complexity.
+      maximumComplexity: Infinity,
+      calculators: options.calculators,
+      variables: options.variables,
+      operationName: options.operationName,
+    });
 
-  visit(options.query, visitWithTypeInfo(typeInfo, visitor));
+    visit(options.query, visitWithTypeInfo(typeInfo, visitor));
 
-  for (const errorCheck of options?.errorChecks || []) {
-    const maybeErrors = errorCheck(visitor.complexity);
-    if (maybeErrors?.length) {
-      errors.push(...maybeErrors);
+    for (const errorCheck of options?.errorChecks || []) {
+      const maybeErrors = errorCheck(visitor.complexity);
+      if (maybeErrors?.length) {
+        errors.push(...maybeErrors);
+      }
     }
-  }
 
-  return {
-    cost: visitor.complexity.cost,
-    extra: visitor.complexity.extra,
-    errors,
-    getTree: () => visitor.complexity.tree,
-  };
+    return {
+      cost: visitor.complexity.cost,
+      extra: visitor.complexity.extra,
+      errors,
+      getTree: () => visitor.complexity.tree,
+    };
+  } catch (error) {
+    if (options.throwErrors) {
+      throw error;
+    }
+    return {
+      cost: 0,
+      getTree: () => null,
+    };
+  }
 }
 
 const includeNode = ({
@@ -308,7 +319,6 @@ class QueryComplexity {
           );
         }
 
-        // this.complexity += this.nodeComplexity(operation, this.context.getSchema().getQueryType()!);
         const complexityNode = getChilds({
           node: operation,
           typeDef: queryType,

@@ -898,4 +898,46 @@ describe('maxItems on field', () => {
     expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
     expect(complexity.extra?.maxCalls['field-Query:test'].mergeValue).toBe(4);
   });
+
+  it('deep object', async () => {
+    const baseSchema = gql`
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
+
+      type Query {
+        main: Main
+      }
+
+      type Main {
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", maxTimes: 3)
+      }
+
+      type Obj {
+        string: String
+      }
+    `;
+
+    const query = gql`
+      query {
+        main {
+          test(amount: 4) {
+            string
+          }
+        }
+      }
+    `;
+
+    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+    expect(validationResults).toEqual([]);
+
+    const complexity = getComplexity({
+      calculators,
+      schema,
+      query,
+    });
+
+    expect(complexity.extra?.maxCalls['field-Main:test'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxCalls['field-Main:test'].mergeValue).toBe(4);
+  });
 });

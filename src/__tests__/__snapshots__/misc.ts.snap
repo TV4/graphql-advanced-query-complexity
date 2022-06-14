@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`get tree 1`] = `
+Object {
+  "args": Object {
+    "amount": 4,
+  },
+  "children": Array [
+    Object {
+      "args": Object {},
+      "children": Array [],
+      "cost": 7,
+      "extra": Object {},
+      "multiplier": null,
+      "name": "field_string",
+      "selected": true,
+      "thisCost": 7,
+    },
+  ],
+  "cost": 28,
+  "extra": Object {
+    "maxCalls": Object {
+      "field-Query:test": Object {
+        "maxTimes": 3,
+        "mergeValue": 4,
+      },
+    },
+  },
+  "multiplier": 4,
+  "name": "field_test",
+  "thisCost": 0,
+}
+`;

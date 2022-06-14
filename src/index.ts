@@ -69,12 +69,7 @@ export interface QueryComplexityOptions {
   calculators: Array<ComplexityCalculator>;
 }
 
-// TODO Fix
-function queryComplexityMessage(max: number, actual: number): string {
-  return `The query exceeds the maximum complexity of ${max}. ` + `Actual complexity is ${actual}`;
-}
-
-export type ErrorCheck = (complexity: PublicComplexity) => GraphQLError[] | void;
+export type ErrorCheck = (complexity: ComplexityCollector) => GraphQLError[] | void;
 
 export function getComplexity(options: {
   calculators: ComplexityCalculator[];
@@ -83,7 +78,7 @@ export function getComplexity(options: {
   variables?: Record<string, any>;
   operationName?: string;
   errorChecks?: ErrorCheck[];
-}): PublicComplexity {
+}): Complexity {
   const typeInfo = new TypeInfo(options.schema);
 
   const errors: GraphQLError[] = [];
@@ -105,14 +100,11 @@ export function getComplexity(options: {
     }
   }
 
-  // Throw first error if any
-  // if (errors.length) {
-  //   throw errors.pop();
-  // }
-
   return {
-    ...visitor.complexity,
+    cost: visitor.complexity.cost,
+    extra: visitor.complexity.extra,
     errors,
+    getTree: () => visitor.complexity.tree,
   };
 }
 
@@ -235,7 +227,14 @@ const getChilds: GetNodeComplexity = (
   return children.filter(nonNullable);
 };
 
-export type PublicComplexity = {
+export type Complexity = {
+  cost: number;
+  extra?: Extra;
+  errors?: GraphQLError[];
+  getTree: () => ComplexityNode | null;
+};
+
+export type ComplexityCollector = {
   cost: number;
   tree: ComplexityNode | null;
   extra?: Extra;
@@ -244,7 +243,7 @@ export type PublicComplexity = {
 
 class QueryComplexity {
   context: ValidationContext;
-  complexity: PublicComplexity;
+  complexity: ComplexityCollector;
   options: QueryComplexityOptions;
   OperationDefinition: Record<string, any>;
   calculators: Array<ComplexityCalculator>;

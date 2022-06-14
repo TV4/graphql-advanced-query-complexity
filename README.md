@@ -69,7 +69,7 @@ This example uses Apollo Server, but that is no requirement. Works with every Gr
 Create a new Apollo Server plugin with this code
 
 ```ts
-import { 
+import {
   getComplexity,
   fieldCalculator,
   objectCalculator,
@@ -101,8 +101,8 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
           createMaxCostErrorCheck({ maxCost: 6 })
         ],
         onValidationError: (_error) => {},
-        
-        
+
+
                 // TODO FIX THESE
         variables?: Record<string, any>;
         operationName?: string;
@@ -181,7 +181,7 @@ As we added a `console.log` statement to our Apollo server plugin this is now pr
     "maxCalls": {
       "type-Obj": {
         "maxTimes": 3,
-        "mergeValue": 4
+        "value": 4
       }
     }
   }

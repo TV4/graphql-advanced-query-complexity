@@ -22,7 +22,7 @@ export const objectCalculator = (options: { directive: GraphQLDirective }): Comp
         maxCalls: {
           [`type-${args.fieldTypeName}`]: {
             maxTimes: directiveValues.maxTimes,
-            mergeValue: 1,
+            value: 1,
           },
         },
       };

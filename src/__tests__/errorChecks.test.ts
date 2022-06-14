@@ -6,8 +6,7 @@ import { getComplexity } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
 import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '..';
-import { maxCallErrorCheck } from '..';
-import { createMaxCostErrorCheck } from '../errorChecks/maxCostErrorCheck';
+import { maxCallErrorCheck, createMaxCostErrorCheck } from '..';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());

@@ -11,7 +11,7 @@ const customMerge = (valueMergeStrategy: ValueMergeStrategy) =>
         const numbers: ReadonlyArray<number> = values;
         const { key } = meta;
 
-        if (key === 'mergeValue') {
+        if (key === 'value') {
           if (valueMergeStrategy === 'sum') {
             return numbers.reduce((sum, value) => sum + value);
           }

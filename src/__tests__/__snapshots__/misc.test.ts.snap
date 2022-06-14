@@ -22,7 +22,7 @@ Object {
     "maxCalls": Object {
       "field-Query:test": Object {
         "maxTimes": 3,
-        "mergeValue": 4,
+        "value": 4,
       },
     },
   },

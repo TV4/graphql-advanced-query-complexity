@@ -48,7 +48,7 @@ it('basic example', async () => {
   });
 
   expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
-  expect(complexity.extra?.maxCalls['field-Query:test'].mergeValue).toBe(4);
+  expect(complexity.extra?.maxCalls['field-Query:test'].value).toBe(4);
 });
 
 it('basic example 2', async () => {
@@ -84,5 +84,5 @@ it('basic example 2', async () => {
   });
 
   expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
-  expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(4);
+  expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
 });

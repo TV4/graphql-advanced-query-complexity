@@ -70,7 +70,7 @@ describe('Max times object called', () => {
 
     expect(complexity.cost).toBe(0);
     expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(4);
+    expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
   });
 
   it('list', async () => {
@@ -107,7 +107,7 @@ describe('Max times object called', () => {
 
     expect(complexity.cost).toBe(0);
     expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(4);
+    expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
   });
 
   it('winning path', async () => {
@@ -179,7 +179,7 @@ describe('Max times object called', () => {
 
     expect(complexity.cost).toBe(0);
     expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(10);
-    expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(12);
+    expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(12);
   });
 
   it('multiple objects', async () => {
@@ -234,9 +234,9 @@ describe('Max times object called', () => {
 
     expect(complexity.cost).toBe(0);
     expect(complexity.extra?.maxCalls['type-Obj1'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['type-Obj1'].mergeValue).toBe(1);
+    expect(complexity.extra?.maxCalls['type-Obj1'].value).toBe(1);
     expect(complexity.extra?.maxCalls['type-Obj2'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['type-Obj2'].mergeValue).toBe(2);
+    expect(complexity.extra?.maxCalls['type-Obj2'].value).toBe(2);
   });
 
   it('fragment', async () => {
@@ -298,9 +298,9 @@ describe('Max times object called', () => {
 
     expect(complexity.cost).toBe(0);
     expect(complexity.extra?.maxCalls['type-Obj1'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['type-Obj1'].mergeValue).toBe(1);
+    expect(complexity.extra?.maxCalls['type-Obj1'].value).toBe(1);
     expect(complexity.extra?.maxCalls['type-Obj2'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['type-Obj2'].mergeValue).toBe(2);
+    expect(complexity.extra?.maxCalls['type-Obj2'].value).toBe(2);
   });
 
   it('objects and lists', async () => {
@@ -366,12 +366,12 @@ describe('Max times object called', () => {
     expect(complexity.cost).toBe(0);
 
     expect(complexity.extra?.maxCalls['type-SimpleObj'].maxTimes).toBe(5);
-    expect(complexity.extra?.maxCalls['type-SimpleObj'].mergeValue).toBe(4);
+    expect(complexity.extra?.maxCalls['type-SimpleObj'].value).toBe(4);
 
     expect(complexity.extra?.maxCalls['type-unionObj1'].maxTimes).toBe(4);
-    expect(complexity.extra?.maxCalls['type-unionObj1'].mergeValue).toBe(5);
+    expect(complexity.extra?.maxCalls['type-unionObj1'].value).toBe(5);
 
     expect(complexity.extra?.maxCalls['type-unionObj2'].maxTimes).toBe(10);
-    expect(complexity.extra?.maxCalls['type-unionObj2'].mergeValue).toBe(5);
+    expect(complexity.extra?.maxCalls['type-unionObj2'].value).toBe(5);
   });
 });

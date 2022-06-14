@@ -47,10 +47,8 @@ it('basic example', async () => {
     query,
   });
 
-  //   console.log(JSON.stringify(complexity, null, 2));
-
-  expect(complexity.extra?.maxCalls['field-test'].maxTimes).toBe(3);
-  expect(complexity.extra?.maxCalls['field-test'].mergeValue).toBe(4);
+  expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
+  expect(complexity.extra?.maxCalls['field-Query:test'].mergeValue).toBe(4);
 });
 
 it('basic example 2', async () => {

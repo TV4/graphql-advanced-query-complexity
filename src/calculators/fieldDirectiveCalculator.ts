@@ -22,7 +22,7 @@ export const fieldDirectiveCalculator = (options: { directive: GraphQLDirective 
     const extra: Extra | undefined = directiveValues.maxTimes
       ? {
           maxCalls: {
-            [`field-${args.field.name}`]: {
+            [`field-${args.type.name}:${args.field.name}`]: {
               maxTimes: directiveValues.maxTimes,
               mergeValue: 1,
             },

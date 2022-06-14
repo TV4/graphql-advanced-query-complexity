@@ -72,61 +72,6 @@ describe('Max times object called', () => {
     expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(4);
   });
 
-  it('simple object, giving errors', async () => {
-    const baseSchema = gql`
-      ${fieldDirectiveSDL}
-      ${objectDirectiveSDL}
-
-      type Query {
-        test: Main
-      }
-
-      type Main {
-        obj1: Obj
-        obj2: Obj
-        obj3: Obj
-        obj4: Obj
-      }
-
-      type Obj @objComplexity(maxTimes: 3) {
-        string: String
-      }
-    `;
-
-    const query = gql`
-      query {
-        test {
-          obj1 {
-            string
-          }
-          obj2 {
-            string
-          }
-          obj3 {
-            string
-          }
-          obj4 {
-            string
-          }
-        }
-      }
-    `;
-
-    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
-    expect(validationResults).toEqual([]);
-
-    const complexity = getComplexity({
-      calculators,
-      schema,
-      query,
-      errorChecks: [maxCallErrorCheck], // <-- This is causing errors
-    });
-
-    expect(complexity.errors?.length).toBe(1);
-    expect(complexity.errors?.[0].message).toBe('type Obj may only be queried 3 times. Was queried 4 times');
-  });
-
   it('list', async () => {
     const baseSchema = gql`
       ${fieldDirectiveSDL}

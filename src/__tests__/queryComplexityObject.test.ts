@@ -2,9 +2,10 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
 import { fieldDirectiveCalculator } from '../calculators/fieldDirectiveCalculator';
-import { maxCallErrorCheck, objectDirectiveCalculator } from '../calculators/objectDirectiveCalculator';
+import { objectDirectiveCalculator } from '../calculators/objectDirectiveCalculator';
 import { getComplexity } from '..';
 import { createSDLFromDirective, createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
+import { maxCallErrorCheck } from '../errorChecks';
 
 const objectDirectiveSDL = createSDLFromDirective(createComplexityObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createComplexityFieldDirective());

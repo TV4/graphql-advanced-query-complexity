@@ -14,18 +14,29 @@ import {
 import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, GetNodeComplexity } from '.';
 import { runCalculators } from './runCalculators';
 
-export const handleInlineFragment = (
-  childNode: InlineFragmentNode,
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
-  validationContext: ValidationContext,
-  variableValues: Record<string, any>,
-  _fields: GraphQLFieldMap<any, any>,
-  includeDirectiveDef: GraphQLDirective,
-  skipDirectiveDef: GraphQLDirective,
-  getNodeComplexity: GetNodeComplexity,
-  calculators: Array<ComplexityCalculator>,
-  schema: GraphQLSchema
-): ComplexityNode => {
+export const handleInlineFragment = ({
+  childNode,
+  typeDef,
+  validationContext,
+  variableValues,
+  fields,
+  includeDirectiveDef,
+  skipDirectiveDef,
+  getNodeComplexity,
+  calculators,
+  schema,
+}: {
+  childNode: InlineFragmentNode;
+  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
+  validationContext: ValidationContext;
+  variableValues: Record<string, any>;
+  fields: GraphQLFieldMap<any, any>;
+  includeDirectiveDef?: GraphQLDirective;
+  skipDirectiveDef?: GraphQLDirective;
+  getNodeComplexity: GetNodeComplexity;
+  calculators: Array<ComplexityCalculator>;
+  schema: GraphQLSchema;
+}): ComplexityNode => {
   let inlineFragmentType: GraphQLNamedType = typeDef;
   if (childNode.typeCondition && childNode.typeCondition.name) {
     inlineFragmentType = validationContext.getSchema().getType(childNode.typeCondition.name.value)!;
@@ -47,16 +58,16 @@ export const handleInlineFragment = (
     schema,
   };
 
-  const children = getNodeComplexity(
-    childNode,
-    inlineFragmentType,
+  const children = getNodeComplexity({
+    node: childNode,
+    typeDef: inlineFragmentType,
     validationContext,
     includeDirectiveDef,
     skipDirectiveDef,
     variableValues,
     calculators,
-    schema
-  );
+    schema,
+  });
 
   const { multiplier, cost, extra, childComplexity } = runCalculators({
     calculatorArgs,

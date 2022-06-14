@@ -13,7 +13,6 @@ import {
   GraphQLSchema,
   GraphQLUnionType,
   InlineFragmentNode,
-  isAbstractType,
   Kind,
   OperationDefinitionNode,
   TypeInfo,
@@ -108,12 +107,17 @@ export function getComplexity(options: {
   };
 }
 
-const includeNode = (
-  childNode: FieldNode | FragmentSpreadNode | InlineFragmentNode,
-  includeDirectiveDef: GraphQLDirective,
-  skipDirectiveDef: GraphQLDirective,
-  variableValues: Record<string, any>
-): boolean => {
+const includeNode = ({
+  childNode,
+  includeDirectiveDef,
+  skipDirectiveDef,
+  variableValues,
+}: {
+  childNode: FieldNode | FragmentSpreadNode | InlineFragmentNode;
+  includeDirectiveDef?: GraphQLDirective;
+  skipDirectiveDef?: GraphQLDirective;
+  variableValues: Record<string, any>;
+}): boolean => {
   let includeNode = true;
   let skipNode = false;
 
@@ -121,12 +125,20 @@ const includeNode = (
     const directiveName = directive.name.value;
     switch (directiveName) {
       case 'include': {
+        if (!includeDirectiveDef) {
+          return true;
+        }
+
         const values = getDirectiveValues(includeDirectiveDef, childNode, variableValues || {});
         const ifClause = values?.if;
         includeNode = isBoolean(ifClause) ? ifClause : true;
         break;
       }
       case 'skip': {
+        if (!skipDirectiveDef) {
+          return false;
+        }
+
         const values = getDirectiveValues(skipDirectiveDef, childNode, variableValues || {});
         const ifClause = values?.if;
         skipNode = isBoolean(ifClause) ? ifClause : false;
@@ -138,18 +150,18 @@ const includeNode = (
   return includeNode && !skipNode;
 };
 
-export type GetNodeComplexity = (
-  node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode,
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
-  validationContext: ValidationContext,
-  includeDirectiveDef: GraphQLDirective,
-  skipDirectiveDef: GraphQLDirective,
-  variableValues: Record<string, any>,
-  calculators: Array<ComplexityCalculator>,
-  schema: GraphQLSchema
-) => ComplexityNode[] | null;
+export type GetNodeComplexity = (props: {
+  node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode;
+  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
+  validationContext: ValidationContext;
+  includeDirectiveDef?: GraphQLDirective;
+  skipDirectiveDef?: GraphQLDirective;
+  variableValues: Record<string, any>;
+  calculators: Array<ComplexityCalculator>;
+  schema: GraphQLSchema;
+}) => ComplexityNode[] | null;
 
-const getChilds: GetNodeComplexity = (
+const getChilds: GetNodeComplexity = ({
   node,
   typeDef,
   validationContext,
@@ -157,8 +169,8 @@ const getChilds: GetNodeComplexity = (
   skipDirectiveDef,
   variableValues,
   calculators,
-  schema
-) => {
+  schema,
+}) => {
   let fields: GraphQLFieldMap<any, any> = {};
   if (typeDef instanceof GraphQLObjectType || typeDef instanceof GraphQLInterfaceType) {
     fields = typeDef.getFields();
@@ -170,52 +182,52 @@ const getChilds: GetNodeComplexity = (
 
   const children = node.selectionSet.selections.map(
     (childNode: FieldNode | FragmentSpreadNode | InlineFragmentNode) => {
-      if (!includeNode(childNode, includeDirectiveDef, skipDirectiveDef, variableValues)) {
+      if (!includeNode({ childNode, includeDirectiveDef, skipDirectiveDef, variableValues })) {
         return null;
       }
 
       switch (childNode.kind) {
         case Kind.FIELD: {
-          return handleField(
-            childNode,
-            typeDef,
-            validationContext,
-            variableValues,
-            fields,
-            includeDirectiveDef,
-            skipDirectiveDef,
-            getChilds,
-            calculators,
-            schema
-          );
+          return handleField({
+            childNode: childNode,
+            typeDef: typeDef,
+            validationContext: validationContext,
+            variableValues: variableValues,
+            fields: fields,
+            includeDirectiveDef: includeDirectiveDef,
+            skipDirectiveDef: skipDirectiveDef,
+            getNodeComplexity: getChilds,
+            calculators: calculators,
+            schema: schema,
+          });
         }
         case Kind.INLINE_FRAGMENT: {
-          return handleInlineFragment(
-            childNode,
-            typeDef,
-            validationContext,
-            variableValues,
-            fields,
-            includeDirectiveDef,
-            skipDirectiveDef,
-            getChilds,
-            calculators,
-            schema
-          );
+          return handleInlineFragment({
+            childNode: childNode,
+            typeDef: typeDef,
+            validationContext: validationContext,
+            variableValues: variableValues,
+            fields: fields,
+            includeDirectiveDef: includeDirectiveDef,
+            skipDirectiveDef: skipDirectiveDef,
+            getNodeComplexity: getChilds,
+            calculators: calculators,
+            schema: schema,
+          });
         }
         case Kind.FRAGMENT_SPREAD: {
-          return handleFragmentSpread(
-            childNode,
-            typeDef,
-            validationContext,
-            variableValues,
-            fields,
-            includeDirectiveDef,
-            skipDirectiveDef,
-            getChilds,
-            calculators,
-            schema
-          );
+          return handleFragmentSpread({
+            childNode: childNode,
+            typeDef: typeDef,
+            validationContext: validationContext,
+            variableValues: variableValues,
+            fields: fields,
+            includeDirectiveDef: includeDirectiveDef,
+            skipDirectiveDef: skipDirectiveDef,
+            getNodeComplexity: getChilds,
+            calculators: calculators,
+            schema: schema,
+          });
         }
         default: {
           throw new Error(`Unsupported node kind ${(childNode as any)?.kind}`);
@@ -247,8 +259,8 @@ class QueryComplexity {
   options: QueryComplexityOptions;
   OperationDefinition: Record<string, any>;
   calculators: Array<ComplexityCalculator>;
-  includeDirectiveDef: GraphQLDirective;
-  skipDirectiveDef: GraphQLDirective;
+  includeDirectiveDef?: GraphQLDirective;
+  skipDirectiveDef?: GraphQLDirective;
   variableValues: Record<string, any>;
 
   constructor(context: ValidationContext, options: QueryComplexityOptions) {
@@ -259,15 +271,21 @@ class QueryComplexity {
     this.context = context;
     this.complexity = { cost: 0, tree: null };
     this.options = options;
-
-    this.includeDirectiveDef = this.context.getSchema().getDirective('include')!;
-    this.skipDirectiveDef = this.context.getSchema().getDirective('skip')!;
     this.calculators = options.calculators;
     this.variableValues = {};
-
     this.OperationDefinition = {
       enter: this.onOperationDefinitionEnter,
     };
+
+    const includeDirectiveDef = this.context.getSchema().getDirective('include');
+    if (includeDirectiveDef) {
+      this.includeDirectiveDef = includeDirectiveDef;
+    }
+
+    const skipDirectiveDef = this.context.getSchema().getDirective('skip');
+    if (skipDirectiveDef) {
+      this.skipDirectiveDef = skipDirectiveDef;
+    }
   }
 
   onOperationDefinitionEnter(operation: OperationDefinitionNode): void {
@@ -277,42 +295,57 @@ class QueryComplexity {
 
     // Get variable values from variables that are passed from options, merged
     // with default values defined in the operation
-    this.variableValues = getVariableValues(
+    const variableValues = getVariableValues(
       this.context.getSchema(),
       operation.variableDefinitions ?? [],
       this.options.variables ?? {}
-    ).coerced!;
+    ).coerced;
+
+    if (!variableValues) {
+      throw new Error(
+        `Query complexity could not be calculated for operation of type ${operation.operation}. Variable values can not be read`
+      );
+    }
+
+    this.variableValues = variableValues;
 
     switch (operation.operation) {
       case 'query':
-        // this.complexity += this.nodeComplexity(operation, this.context.getSchema().getQueryType()!);
-        const x = getChilds(
-          operation,
-          this.context.getSchema().getQueryType()!,
-          this.context,
-          this.includeDirectiveDef,
-          this.skipDirectiveDef,
-          this.variableValues,
-          this.calculators,
-          this.context.getSchema()
-        );
-
-        if (!x) {
-          throw new Error('x is null');
+        const queryType = this.context.getSchema().getQueryType();
+        if (!queryType) {
+          throw new Error(
+            `Query complexity could not be calculated for operation of type ${operation.operation}. No queryType found`
+          );
         }
 
-        if (x.length !== 1) {
-          console.log('output length is a strange format');
-          console.log(require('util').inspect(x, { showHidden: true, depth: null, colors: true, breakLength: 200 }));
-          //throw new Error('x.length !== 1');
-          break;
+        // this.complexity += this.nodeComplexity(operation, this.context.getSchema().getQueryType()!);
+        const complexityNode = getChilds({
+          node: operation,
+          typeDef: queryType,
+          validationContext: this.context,
+          includeDirectiveDef: this.includeDirectiveDef,
+          skipDirectiveDef: this.skipDirectiveDef,
+          variableValues: this.variableValues,
+          calculators: this.calculators,
+          schema: this.context.getSchema(),
+        });
+
+        if (!complexityNode) {
+          throw new Error(
+            `Query complexity could not be calculated for operation of type ${operation.operation}. No complexityNode found`
+          );
+        }
+
+        if (complexityNode.length !== 1) {
+          throw new Error(
+            `Query complexity could not be calculated for operation of type ${operation.operation}. Multiple results found`
+          );
         }
 
         this.complexity = {
-          cost: x[0].cost || 0,
-          extra: x[0].extra,
-          //cost: (x[0].cost || 0) * (x[0].multiplier || 1),
-          tree: x[0],
+          cost: complexityNode[0].cost || 0,
+          extra: complexityNode[0].extra,
+          tree: complexityNode[0],
         };
         break;
       case 'mutation':

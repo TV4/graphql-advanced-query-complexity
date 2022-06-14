@@ -20,18 +20,29 @@ import { runCalculators } from './runCalculators';
 const BUILT_IN_SCALAR_NAMES = ['String', 'Int', 'Float', 'Boolean', 'ID'];
 const isBuiltInScalar = (typeName: string) => BUILT_IN_SCALAR_NAMES.includes(typeName);
 
-export const handleField = (
-  childNode: FieldNode,
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
-  validationContext: ValidationContext,
-  variableValues: Record<string, any>,
-  fields: GraphQLFieldMap<any, any>,
-  includeDirectiveDef: GraphQLDirective,
-  skipDirectiveDef: GraphQLDirective,
-  getNodeComplexity: GetNodeComplexity,
-  calculators: Array<ComplexityCalculator>,
-  schema: GraphQLSchema
-): ComplexityNode | null => {
+export const handleField = ({
+  childNode,
+  typeDef,
+  validationContext,
+  variableValues,
+  fields,
+  includeDirectiveDef,
+  skipDirectiveDef,
+  getNodeComplexity,
+  calculators,
+  schema,
+}: {
+  childNode: FieldNode;
+  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
+  validationContext: ValidationContext;
+  variableValues: Record<string, any>;
+  fields: GraphQLFieldMap<any, any>;
+  includeDirectiveDef?: GraphQLDirective;
+  skipDirectiveDef?: GraphQLDirective;
+  getNodeComplexity: GetNodeComplexity;
+  calculators: Array<ComplexityCalculator>;
+  schema: GraphQLSchema;
+}): ComplexityNode | null => {
   const field = fields[childNode.name.value];
   // Invalid field, should be caught by other validation rules
   if (!field) {
@@ -61,16 +72,16 @@ export const handleField = (
   }
 
   const children: ComplexityNode[] | null = isCompositeType(fieldType)
-    ? getNodeComplexity(
-        childNode,
-        fieldType,
+    ? getNodeComplexity({
+        node: childNode,
+        typeDef: fieldType,
         validationContext,
         includeDirectiveDef,
         skipDirectiveDef,
         variableValues,
         calculators,
-        schema
-      )
+        schema,
+      })
     : [];
 
   const name = `field_${childNode.name.value}`;

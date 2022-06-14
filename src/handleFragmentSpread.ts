@@ -12,18 +12,29 @@ import {
 import { getChildComplexity } from './getChildComplexity';
 import { ComplexityCalculator, ComplexityNode, GetNodeComplexity } from '.';
 
-export const handleFragmentSpread = (
-  childNode: FragmentSpreadNode,
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
-  validationContext: ValidationContext,
-  variableValues: Record<string, any>,
-  fields: GraphQLFieldMap<any, any>,
-  includeDirectiveDef: GraphQLDirective,
-  skipDirectiveDef: GraphQLDirective,
-  getNodeComplexity: GetNodeComplexity,
-  calculators: Array<ComplexityCalculator>,
-  schema: GraphQLSchema
-): ComplexityNode | null => {
+export const handleFragmentSpread = ({
+  childNode,
+  typeDef,
+  validationContext,
+  variableValues,
+  fields,
+  includeDirectiveDef,
+  skipDirectiveDef,
+  getNodeComplexity,
+  calculators,
+  schema,
+}: {
+  childNode: FragmentSpreadNode;
+  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
+  validationContext: ValidationContext;
+  variableValues: Record<string, any>;
+  fields: GraphQLFieldMap<any, any>;
+  includeDirectiveDef?: GraphQLDirective;
+  skipDirectiveDef?: GraphQLDirective;
+  getNodeComplexity: GetNodeComplexity;
+  calculators: Array<ComplexityCalculator>;
+  schema: GraphQLSchema;
+}): ComplexityNode | null => {
   const fragment = validationContext.getFragment(childNode.name.value);
   // Unknown fragment, should be caught by other validation rules
   if (!fragment) {
@@ -35,16 +46,16 @@ export const handleFragmentSpread = (
     throw new Error(`${fragment.typeCondition.name.value} is not a composite type`);
   }
 
-  const children = getNodeComplexity(
-    fragment,
-    fragmentType,
+  const children = getNodeComplexity({
+    node: fragment,
+    typeDef: fragmentType,
     validationContext,
     includeDirectiveDef,
     skipDirectiveDef,
     variableValues,
     calculators,
-    schema
-  );
+    schema,
+  });
 
   const thisCost = 0; // TODO change
   const childComplexity = getChildComplexity(children);

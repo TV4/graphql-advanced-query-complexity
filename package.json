@@ -10,7 +10,8 @@
     "test": "jest",
     "typecheck": "tsc --noEmit --pretty",
     "build": "tsup --dts",
-    "devbuildpack": "npm run build && npm pack"
+    "devbuildpack": "npm run build && npm pack",
+    "lint": "eslint 'src/**/*.ts' -f codeframe --max-warnings 0"
   },
   "repository": {
     "type": "git",
@@ -39,24 +40,30 @@
     "tabWidth": 2
   },
   "devDependencies": {
+    "@graphql-tools/schema": "^8.3.13",
+    "@graphql-tools/utils": "^8.6.12",
     "@types/jest": "^27.5.1",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-formatter-codeframe": "^7.32.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "graphql": "^16.5.0",
     "graphql-tag": "^2.12.6",
     "jest": "^28.1.0",
     "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
     "ts-jest": "^28.0.3",
     "tsup": "^6.0.1",
-    "typescript": "^4.7.2",
-    "graphql": "^16.5.0",
-    "@graphql-tools/schema": "^8.3.13",
-    "@graphql-tools/utils": "^8.6.12"
+    "typescript": "^4.7.2"
   },
   "dependencies": {
     "deepmerge-ts": "^4.0.3"
   },
   "peerDependencies": {
-    "graphql": "^16.5.0",
     "@graphql-tools/schema": "^8.3.13",
-    "@graphql-tools/utils": "^8.6.12"
+    "@graphql-tools/utils": "^8.6.12",
+    "graphql": "^16.5.0"
   }
 }

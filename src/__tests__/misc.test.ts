@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import { getComplexity } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
-import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '../directives';
+import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '..';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());

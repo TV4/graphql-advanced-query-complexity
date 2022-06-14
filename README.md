@@ -69,18 +69,20 @@ This example uses Apollo Server, but that is no requirement. Works with every Gr
 Create a new Apollo Server plugin with this code
 
 ```ts
-import { getComplexity } from '@tv4/graphql-advanced-query-complexity';
-import {
-  fieldDirectiveCalculator,
-  objectDirectiveCalculator,
-} from '@tv4/graphql-advanced-query-complexity/dist/calculators';
+import { 
+  getComplexity,
+  fieldCalculator,
+  objectCalculator,
+  maxCallErrorCheck,
+  createMaxCostErrorCheck
+} from '@tv4/graphql-advanced-query-complexity';
 
-export const complexityObjectDirective = createObjectDirective();
-export const complexityFieldDirective = createFieldDirective();
+export const objectDirective = createObjectDirective();
+export const fieldDirective = createFieldDirective();
 
 const calculators = [
-  objectDirectiveCalculator({ directive: complexityObjectDirective }),
-  fieldDirectiveCalculator({ directive: complexityFieldDirective }),
+  objectCalculator({ directive: objectDirective }),
+  fieldCalculator({ directive: fieldDirective }),
 ];
 
 const queryComplexityPlugin: ApolloServerPlugin<Context> = {
@@ -94,6 +96,16 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
         calculators,
         schema,
         query: parse(request.query),
+        errorChecks: [
+          maxCallErrorCheck,
+          createMaxCostErrorCheck({ maxCost: 6 })
+        ],
+        onValidationError: (_error) => {},
+        
+        
+                // TODO FIX THESE
+        variables?: Record<string, any>;
+        operationName?: string;
       });
 
       console.log(
@@ -116,19 +128,19 @@ export const server = new ApolloServer({
 
 ### Add the directives to your schema.
 
-- If you create your schema with code, you want to use the directives (`complexityObjectDirective` and `complexityFieldDirective`) created and exported in your plugins file, as is.
+- If you create your schema with code, you want to use the directives (`objectDirective` and `fieldDirective`) created and exported in your plugins file, as is.
 - If you create your schema with SDL (typically `.gql` files or the `gql` tag in Javascript/Typescript), you must first convert it to SDL
 
 This example shows the SDL way. In your schema index file, add the two directives
 
 ```ts
-import { complexityObjectDirective, complexityFieldDirective } from './your/plugin/file.ts';
+import { objectDirective, fieldDirective } from './your/plugin/file.ts';
 
-const complexityObjectDirectiveSDL = createSDLFromDirective(complexityObjectDirective);
-const complexityFieldDirectiveSDL = createSDLFromDirective(complexityFieldDirective);
+const objectDirectiveSDL = createSDLFromDirective(objectDirective);
+const fieldDirectiveSDL = createSDLFromDirective(fieldDirective);
 
 export const schema = makeExecutableSchema({
-  typeDefs: [complexityObjectDirectiveSDL, complexityFieldDirectiveSDL, otherPartsOfYourSchema],
+  typeDefs: [objectDirectiveSDL, fieldDirectiveSDL, otherPartsOfYourSchema],
 });
 ```
 

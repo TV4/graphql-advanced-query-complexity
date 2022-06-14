@@ -5,8 +5,8 @@ import gql from 'graphql-tag';
 import { getComplexity } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
-import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '../directives';
-import { maxCallErrorCheck } from '../errorChecks';
+import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '..';
+import { maxCallErrorCheck } from '..';
 import { createMaxCostErrorCheck } from '../errorChecks/maxCostErrorCheck';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());

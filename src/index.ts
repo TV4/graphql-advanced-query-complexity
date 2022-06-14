@@ -1,3 +1,4 @@
+import { createMaxCostErrorCheck } from './errorChecks/maxCostErrorCheck';
 import {
   DocumentNode,
   FieldNode,
@@ -19,12 +20,27 @@ import {
   visitWithTypeInfo,
 } from 'graphql';
 import { getDirectiveValues, getVariableValues } from 'graphql/execution/values';
+import { fieldCalculator } from './calculators/fieldCalculator';
+import { objectCalculator } from './calculators/objectCalculator';
 
 import { GetNodeComplexity } from './commonTypes';
+import { createFieldDirective } from './directives/fieldDirective';
+import { createObjectDirective } from './directives/objectDirective';
+import { maxCallErrorCheck } from './errorChecks/maxCallErrorCheck';
 import { handleField } from './handleField';
 import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
-import { isBoolean, nonNullable } from './utils';
+import { createSDLFromDirective, isBoolean, nonNullable } from './utils';
+
+export {
+  fieldCalculator,
+  objectCalculator,
+  createSDLFromDirective,
+  createObjectDirective,
+  createFieldDirective,
+  maxCallErrorCheck,
+  createMaxCostErrorCheck,
+};
 
 export type ComplexityNode = {
   name: string;

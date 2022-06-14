@@ -58,6 +58,7 @@ export type ComplexityCalculator = (
 // Complexity can be anything that is supported by the configured calculators
 export type Complexity = any;
 
+// TODO: Not all of these are used, are they? Fix
 export interface QueryComplexityOptions {
   // The maximum allowed query complexity, queries above this threshold will be rejected
   maximumComplexity: number;
@@ -81,11 +82,13 @@ export interface QueryComplexityOptions {
   calculators: Array<ComplexityCalculator>;
 }
 
+// TODO Fix
 function queryComplexityMessage(max: number, actual: number): string {
   return `The query exceeds the maximum complexity of ${max}. ` + `Actual complexity is ${actual}`;
 }
 
 export type ComplexityPostCheck = (complexity: PublicComplexity) => void;
+export type ErrorCheck = (complexity: PublicComplexity) => GraphQLError[] | void;
 
 export function getComplexity(options: {
   calculators: ComplexityCalculator[];
@@ -94,6 +97,7 @@ export function getComplexity(options: {
   variables?: Record<string, any>;
   operationName?: string;
   postChecks?: ComplexityPostCheck[];
+  errorChecks?: ErrorCheck[];
 }): PublicComplexity {
   const typeInfo = new TypeInfo(options.schema);
 
@@ -109,16 +113,27 @@ export function getComplexity(options: {
 
   visit(options.query, visitWithTypeInfo(typeInfo, visitor));
 
+  // TODO REMOVE
   for (const postCheck of options?.postChecks || []) {
     postCheck(visitor.complexity);
   }
 
-  // Throw first error if any
-  if (errors.length) {
-    throw errors.pop();
+  for (const errorCheck of options?.errorChecks || []) {
+    const maybeErrors = errorCheck(visitor.complexity);
+    if (maybeErrors?.length) {
+      errors.push(...maybeErrors);
+    }
   }
 
-  return visitor.complexity;
+  // Throw first error if any
+  // if (errors.length) {
+  //   throw errors.pop();
+  // }
+
+  return {
+    ...visitor.complexity,
+    errors,
+  };
 }
 
 const includeNode = (
@@ -244,6 +259,7 @@ export type PublicComplexity = {
   cost: number;
   tree: ComplexityNode | null;
   extra?: Extra;
+  errors?: GraphQLError[];
 };
 
 class QueryComplexity {

@@ -52,3 +52,39 @@ it('basic example', async () => {
   expect(complexity.extra?.maxCalls['field-test'].maxTimes).toBe(3);
   expect(complexity.extra?.maxCalls['field-test'].mergeValue).toBe(4);
 });
+
+it('basic example 2', async () => {
+  const baseSchema = gql`
+    ${fieldDirectiveSDL}
+    ${objectDirectiveSDL}
+
+    type Query {
+      complexityExample(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
+    }
+
+    type Obj @objComplexity(maxTimes: 3) {
+      string: String @complexity(cost: 7)
+    }
+  `;
+
+  const query = gql`
+    query {
+      complexityExample(amount: 4) {
+        string
+      }
+    }
+  `;
+
+  const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+  const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+  expect(validationResults).toEqual([]);
+
+  const complexity = getComplexity({
+    calculators,
+    schema,
+    query,
+  });
+
+  expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
+  expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(4);
+});

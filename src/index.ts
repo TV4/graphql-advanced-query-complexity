@@ -25,6 +25,7 @@ import { getDirectiveValues, getVariableValues } from 'graphql/execution/values'
 import { handleField } from './handleField';
 import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
+import { GetNodeComplexity } from './handleTypes';
 import { isBoolean, nonNullable } from './utils';
 
 export type ComplexityNode = {
@@ -149,17 +150,6 @@ const includeNode = ({
 
   return includeNode && !skipNode;
 };
-
-export type GetNodeComplexity = (props: {
-  node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode;
-  typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
-  validationContext: ValidationContext;
-  includeDirectiveDef?: GraphQLDirective;
-  skipDirectiveDef?: GraphQLDirective;
-  variableValues: Record<string, any>;
-  calculators: Array<ComplexityCalculator>;
-  schema: GraphQLSchema;
-}) => ComplexityNode[] | null;
 
 const getChilds: GetNodeComplexity = ({
   node,

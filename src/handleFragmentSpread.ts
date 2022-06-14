@@ -1,17 +1,8 @@
-import { CommonHandle } from './handleTypes';
-import {
-  FragmentSpreadNode,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  ValidationContext,
-  GraphQLFieldMap,
-  GraphQLDirective,
-  isCompositeType,
-  GraphQLSchema,
-} from 'graphql';
+import { FragmentSpreadNode, isCompositeType } from 'graphql';
+
+import { ComplexityNode } from '.';
 import { getChildComplexity } from './getChildComplexity';
-import { ComplexityCalculator, ComplexityNode, GetNodeComplexity } from '.';
+import { CommonHandle } from './handleTypes';
 
 export const handleFragmentSpread = ({
   childNode,

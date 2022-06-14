@@ -1,21 +1,8 @@
-import { CommonHandle } from './handleTypes';
-import { mergeExtra } from './mergeExtra';
 import { getArgumentValues } from '@graphql-tools/utils';
-import {
-  FieldNode,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  ValidationContext,
-  GraphQLFieldMap,
-  GraphQLDirective,
-  getNamedType,
-  isCompositeType,
-  GraphQLSchema,
-} from 'graphql';
+import { FieldNode, getNamedType, isCompositeType } from 'graphql';
 
-import { getChildComplexity } from './getChildComplexity';
-import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, Extra, GetNodeComplexity } from '.';
+import { ComplexityCalculatorArgs, ComplexityNode } from '.';
+import { CommonHandle } from './handleTypes';
 import { runCalculators } from './runCalculators';
 
 const BUILT_IN_SCALAR_NAMES = ['String', 'Int', 'Float', 'Boolean', 'ID'];

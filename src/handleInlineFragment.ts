@@ -1,18 +1,7 @@
-import { CommonHandle } from './handleTypes';
-import {
-  GraphQLDirective,
-  GraphQLFieldMap,
-  GraphQLInterfaceType,
-  GraphQLNamedType,
-  GraphQLObjectType,
-  GraphQLSchema,
-  GraphQLUnionType,
-  InlineFragmentNode,
-  isCompositeType,
-  ValidationContext,
-} from 'graphql';
+import { GraphQLNamedType, InlineFragmentNode, isCompositeType } from 'graphql';
 
-import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, GetNodeComplexity } from '.';
+import { ComplexityCalculatorArgs, ComplexityNode } from '.';
+import { CommonHandle } from './handleTypes';
 import { runCalculators } from './runCalculators';
 
 export const handleInlineFragment = ({

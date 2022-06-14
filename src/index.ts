@@ -87,7 +87,6 @@ function queryComplexityMessage(max: number, actual: number): string {
   return `The query exceeds the maximum complexity of ${max}. ` + `Actual complexity is ${actual}`;
 }
 
-export type ComplexityPostCheck = (complexity: PublicComplexity) => void;
 export type ErrorCheck = (complexity: PublicComplexity) => GraphQLError[] | void;
 
 export function getComplexity(options: {
@@ -96,7 +95,6 @@ export function getComplexity(options: {
   query: DocumentNode;
   variables?: Record<string, any>;
   operationName?: string;
-  postChecks?: ComplexityPostCheck[];
   errorChecks?: ErrorCheck[];
 }): PublicComplexity {
   const typeInfo = new TypeInfo(options.schema);
@@ -112,11 +110,6 @@ export function getComplexity(options: {
   });
 
   visit(options.query, visitWithTypeInfo(typeInfo, visitor));
-
-  // TODO REMOVE
-  for (const postCheck of options?.postChecks || []) {
-    postCheck(visitor.complexity);
-  }
 
   for (const errorCheck of options?.errorChecks || []) {
     const maybeErrors = errorCheck(visitor.complexity);

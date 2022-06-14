@@ -2,11 +2,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
 import { fieldDirectiveCalculator } from '../calculators/fieldDirectiveCalculator';
-import {
-  maxCallErrorCheck,
-  objectDirectiveCalculator,
-  throwOnMaxCalls,
-} from '../calculators/objectDirectiveCalculator';
+import { maxCallErrorCheck, objectDirectiveCalculator } from '../calculators/objectDirectiveCalculator';
 import { getComplexity } from '..';
 import { createSDLFromDirective, createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
 
@@ -75,62 +71,7 @@ describe('Max times object called', () => {
     expect(complexity.extra?.maxCalls['type-Obj'].mergeValue).toBe(4);
   });
 
-  it('simple object, throwing', async () => {
-    const baseSchema = gql`
-      ${fieldDirectiveSDL}
-      ${objectDirectiveSDL}
-
-      type Query {
-        test: Main
-      }
-
-      type Main {
-        obj1: Obj
-        obj2: Obj
-        obj3: Obj
-        obj4: Obj
-      }
-
-      type Obj @objComplexity(maxTimes: 3) {
-        string: String
-      }
-    `;
-
-    const query = gql`
-      query {
-        test {
-          obj1 {
-            string
-          }
-          obj2 {
-            string
-          }
-          obj3 {
-            string
-          }
-          obj4 {
-            string
-          }
-        }
-      }
-    `;
-
-    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
-    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
-    expect(validationResults).toEqual([]);
-
-    const actual = () =>
-      getComplexity({
-        calculators,
-        schema,
-        query,
-        postChecks: [throwOnMaxCalls], // <-- This is causing it to throw
-      });
-
-    expect(actual).toThrow('type Obj may only be queried 3 times. Was queried 4 times');
-  });
-
-  it.only('simple object, giving errors', async () => {
+  it('simple object, giving errors', async () => {
     const baseSchema = gql`
       ${fieldDirectiveSDL}
       ${objectDirectiveSDL}

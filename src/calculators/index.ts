@@ -1,4 +1,4 @@
 import { fieldDirectiveCalculator } from './fieldDirectiveCalculator';
-import { objectDirectiveCalculator, throwOnMaxCalls } from './objectDirectiveCalculator';
+import { objectDirectiveCalculator, maxCallErrorCheck } from './objectDirectiveCalculator';
 
-export { fieldDirectiveCalculator, objectDirectiveCalculator, throwOnMaxCalls };
+export { fieldDirectiveCalculator, objectDirectiveCalculator, maxCallErrorCheck };

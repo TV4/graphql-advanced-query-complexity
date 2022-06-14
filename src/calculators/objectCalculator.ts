@@ -1,9 +1,8 @@
-import { getDirectiveValues, GraphQLDirective, GraphQLError } from 'graphql';
+import { getDirectiveValues, GraphQLDirective } from 'graphql';
 
-import { ComplexityCalculator, ErrorCheck, Extra } from '..';
-import { isNumber } from '../utils';
+import { ComplexityCalculator, Extra } from '..';
 
-export const objectDirectiveCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
+export const objectCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
   return (args) => {
     const schemaTypeNode = args.schema.getType(args.fieldTypeName);
 

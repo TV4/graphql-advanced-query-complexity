@@ -1,8 +1,8 @@
 import { astFromDirective } from '@graphql-tools/utils';
 import { GraphQLDirective, print } from 'graphql';
-import { createComplexityFieldDirective } from './complexityFieldDirective';
-import { createComplexityObjectDirective } from './complexityObjectDirective';
+import { createFieldDirective } from './fieldDirective';
+import { createObjectDirective } from './objectDirective';
 
-export { createComplexityFieldDirective, createComplexityObjectDirective };
+export { createFieldDirective, createObjectDirective };
 
 export const createSDLFromDirective = (directive: GraphQLDirective) => print(astFromDirective(directive));

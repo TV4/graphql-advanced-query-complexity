@@ -1,18 +1,18 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
-import { fieldDirectiveCalculator } from '../calculators/fieldDirectiveCalculator';
-import { objectDirectiveCalculator } from '../calculators/objectDirectiveCalculator';
-import { getComplexity } from '..';
-import { createSDLFromDirective, createComplexityObjectDirective, createComplexityFieldDirective } from '../directives';
-import { maxCallErrorCheck } from '../errorChecks';
 
-const objectDirectiveSDL = createSDLFromDirective(createComplexityObjectDirective());
-const fieldDirectiveSDL = createSDLFromDirective(createComplexityFieldDirective());
+import { getComplexity } from '..';
+import { fieldCalculator } from '../calculators/fieldCalculator';
+import { objectCalculator } from '../calculators/objectCalculator';
+import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '../directives';
+
+const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
+const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());
 
 const calculators = [
-  objectDirectiveCalculator({ directive: createComplexityObjectDirective() }),
-  fieldDirectiveCalculator({ directive: createComplexityFieldDirective() }),
+  objectCalculator({ directive: createObjectDirective() }),
+  fieldCalculator({ directive: createFieldDirective() }),
   // simpleCalculator({ defaultComplexity: 0 }),
 ];
 

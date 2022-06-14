@@ -1,14 +1,4 @@
-import { astFromDirective } from '@graphql-tools/utils';
-import {
-  GraphQLDirective,
-  GraphQLInputType,
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLString,
-  GraphQLInt,
-  DirectiveLocation,
-  print,
-} from 'graphql';
+import { DirectiveLocation, GraphQLDirective, GraphQLInputType, GraphQLInt } from 'graphql';
 
 const DEFAULT_TYPE_COMPLEXITY_NAME = 'objComplexity';
 
@@ -24,7 +14,7 @@ type CustomTypeComplexityOptions = {
   // batchSize?: number;
 };
 
-export const createComplexityObjectDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
+export const createObjectDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
   const args: Record<
     keyof CustomTypeComplexityOptions,
     {

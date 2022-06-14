@@ -1,4 +1,4 @@
-import { fieldDirectiveCalculator } from './fieldDirectiveCalculator';
-import { objectDirectiveCalculator } from './objectDirectiveCalculator';
+import { fieldCalculator } from './fieldCalculator';
+import { objectCalculator } from './objectCalculator';
 
-export { fieldDirectiveCalculator, objectDirectiveCalculator };
+export { fieldCalculator, objectCalculator };

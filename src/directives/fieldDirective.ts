@@ -12,7 +12,7 @@ type CustomComplexityOptions = {
 
 const DEFAULT_COMPLEXITY_NAME = 'complexity';
 
-export const createComplexityFieldDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
+export const createFieldDirective = (options?: TypeComplexityDirectiveOptions): GraphQLDirective => {
   const args: Record<
     keyof CustomComplexityOptions,
     {

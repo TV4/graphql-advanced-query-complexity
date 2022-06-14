@@ -1,7 +1,6 @@
 import {
   DocumentNode,
   FieldNode,
-  FragmentDefinitionNode,
   FragmentSpreadNode,
   GraphQLCompositeType,
   GraphQLDirective,
@@ -11,7 +10,6 @@ import {
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLSchema,
-  GraphQLUnionType,
   InlineFragmentNode,
   Kind,
   OperationDefinitionNode,
@@ -22,10 +20,10 @@ import {
 } from 'graphql';
 import { getDirectiveValues, getVariableValues } from 'graphql/execution/values';
 
+import { GetNodeComplexity } from './commonTypes';
 import { handleField } from './handleField';
 import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
-import { GetNodeComplexity } from './commonTypes';
 import { isBoolean, nonNullable } from './utils';
 
 export type ComplexityNode = {
@@ -67,15 +65,17 @@ export interface QueryComplexityOptions {
 
 export type ErrorCheck = (complexity: ComplexityCollector) => GraphQLError[] | void;
 
-export function getComplexity(options: {
+export type ComplexityOptions = {
   calculators: ComplexityCalculator[];
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
   operationName?: string;
   errorChecks?: ErrorCheck[];
-  throwErrors?: boolean;
-}): Complexity {
+  onValidationError?: (error: unknown) => void;
+};
+
+export function getComplexity(options: ComplexityOptions): Complexity {
   try {
     const typeInfo = new TypeInfo(options.schema);
 
@@ -103,8 +103,8 @@ export function getComplexity(options: {
       getTree: () => visitor.complexity.tree,
     };
   } catch (error) {
-    if (options.throwErrors) {
-      throw error;
+    if (options.onValidationError) {
+      options.onValidationError(error);
     }
     return {
       cost: 0,
@@ -181,48 +181,27 @@ const getChilds: GetNodeComplexity = ({
         return null;
       }
 
+      const fieldData = {
+        typeDef: typeDef,
+        validationContext: validationContext,
+        variableValues: variableValues,
+        fields: fields,
+        includeDirectiveDef: includeDirectiveDef,
+        skipDirectiveDef: skipDirectiveDef,
+        getNodeComplexity: getChilds,
+        calculators: calculators,
+        schema: schema,
+      };
+
       switch (childNode.kind) {
         case Kind.FIELD: {
-          return handleField({
-            childNode: childNode,
-            typeDef: typeDef,
-            validationContext: validationContext,
-            variableValues: variableValues,
-            fields: fields,
-            includeDirectiveDef: includeDirectiveDef,
-            skipDirectiveDef: skipDirectiveDef,
-            getNodeComplexity: getChilds,
-            calculators: calculators,
-            schema: schema,
-          });
+          return handleField({ childNode, ...fieldData });
         }
         case Kind.INLINE_FRAGMENT: {
-          return handleInlineFragment({
-            childNode: childNode,
-            typeDef: typeDef,
-            validationContext: validationContext,
-            variableValues: variableValues,
-            fields: fields,
-            includeDirectiveDef: includeDirectiveDef,
-            skipDirectiveDef: skipDirectiveDef,
-            getNodeComplexity: getChilds,
-            calculators: calculators,
-            schema: schema,
-          });
+          return handleInlineFragment({ childNode, ...fieldData });
         }
         case Kind.FRAGMENT_SPREAD: {
-          return handleFragmentSpread({
-            childNode: childNode,
-            typeDef: typeDef,
-            validationContext: validationContext,
-            variableValues: variableValues,
-            fields: fields,
-            includeDirectiveDef: includeDirectiveDef,
-            skipDirectiveDef: skipDirectiveDef,
-            getNodeComplexity: getChilds,
-            calculators: calculators,
-            schema: schema,
-          });
+          return handleFragmentSpread({ childNode, ...fieldData });
         }
         default: {
           throw new Error(`Unsupported node kind ${(childNode as any)?.kind}`);

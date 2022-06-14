@@ -1,8 +1,8 @@
 import { FragmentSpreadNode, isCompositeType } from 'graphql';
 
 import { ComplexityNode } from '.';
-import { getChildComplexity } from './getChildComplexity';
 import { CommonHandle } from './commonTypes';
+import { getChildComplexity } from './getChildComplexity';
 
 export const handleFragmentSpread = ({
   // typeDef,

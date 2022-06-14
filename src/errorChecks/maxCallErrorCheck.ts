@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+
 import { ErrorCheck } from '..';
 import { isNumber } from '../utils';
 

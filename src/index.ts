@@ -55,9 +55,6 @@ export type ComplexityCalculator = (
   options: ComplexityCalculatorArgs
 ) => { cost: number; multiplier: number | null } | { extra: Extra } | void;
 
-// Complexity can be anything that is supported by the configured calculators
-export type Complexity = any;
-
 // TODO: Not all of these are used, are they? Fix
 export interface QueryComplexityOptions {
   // The maximum allowed query complexity, queries above this threshold will be rejected
@@ -69,16 +66,6 @@ export interface QueryComplexityOptions {
 
   // specify operation name only when pass multi-operation documents
   operationName?: string;
-
-  // Optional callback function to retrieve the determined query complexity
-  // Will be invoked whether the query is rejected or not
-  // This can be used for logging or to implement rate limiting
-  onComplete?: (complexity: number) => void;
-
-  // Optional function to create a custom error
-  createError?: (max: number, actual: number) => GraphQLError;
-
-  // An array of complexity calculators to use for calculating the complexity
   calculators: Array<ComplexityCalculator>;
 }
 
@@ -281,7 +268,6 @@ class QueryComplexity {
 
     this.OperationDefinition = {
       enter: this.onOperationDefinitionEnter,
-      leave: this.onOperationDefinitionLeave,
     };
   }
 
@@ -341,26 +327,5 @@ class QueryComplexity {
       default:
         throw new Error(`Query complexity could not be calculated for operation of type ${operation.operation}`);
     }
-  }
-
-  onOperationDefinitionLeave(operation: OperationDefinitionNode): void {
-    if (typeof this.options.operationName === 'string' && this.options.operationName !== operation.name?.value) {
-      return;
-    }
-
-    if (this.options.onComplete) {
-      this.options.onComplete(this.complexity.cost);
-    }
-
-    if (this.complexity.cost > this.options.maximumComplexity) {
-      this.context.reportError(this.createError());
-    }
-  }
-
-  createError(): GraphQLError {
-    if (typeof this.options.createError === 'function') {
-      return this.options.createError(this.options.maximumComplexity, this.complexity.cost);
-    }
-    return new GraphQLError(queryComplexityMessage(this.options.maximumComplexity, this.complexity.cost));
   }
 }

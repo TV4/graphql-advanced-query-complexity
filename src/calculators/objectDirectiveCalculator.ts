@@ -1,6 +1,6 @@
-import { ErrorCheck, Extra, PublicComplexity } from '..';
-import { getDirectiveValues, getNamedType, GraphQLDirective, GraphQLError } from 'graphql';
-import { ComplexityCalculator } from '..';
+import { getDirectiveValues, GraphQLDirective, GraphQLError } from 'graphql';
+
+import { ComplexityCalculator, ErrorCheck, Extra } from '..';
 import { isNumber } from '../utils';
 
 export const maxCallErrorCheck: ErrorCheck = (complexity) => {

@@ -96,6 +96,7 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
         calculators,
         schema,
         query: parse(request.query),
+        variables: request.variables,
         errorChecks: [
           maxCallErrorCheck,
           createMaxCostErrorCheck({ maxCost: 6 })
@@ -234,7 +235,13 @@ type ComplexityOptions = {
 };
 ```
 
-#### TODO variables
+#### `variables`
+
+Incoming query variables, in Apollo Server, set to
+
+```ts
+variables: request.variables;
+```
 
 #### TODO operationName
 

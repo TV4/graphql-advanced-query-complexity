@@ -31,6 +31,7 @@ import { handleField } from './handleField';
 import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
 import { createSDLFromDirective, isBoolean, nonNullable } from './utils';
+import { mergeExtra } from './mergeExtra';
 
 export {
   fieldCalculator,
@@ -234,12 +235,12 @@ export type Complexity = {
   cost: number;
   extra?: Extra;
   errors?: GraphQLError[];
-  getTree: () => ComplexityNode | null;
+  getTree: () => ComplexityNode[] | null;
 };
 
 export type ComplexityCollector = {
   cost: number;
-  tree: ComplexityNode | null;
+  tree: ComplexityNode[] | null;
   extra?: Extra;
   errors?: GraphQLError[];
 };
@@ -326,15 +327,13 @@ class QueryComplexity {
           );
         }
 
-        this.complexity = {
-          cost: complexityNode[0].cost || 0,
-          extra: complexityNode[0].extra,
-          tree: complexityNode[0],
-        };
+        const allExtra = [this.complexity.extra, complexityNode[0].extra].filter(nonNullable);
 
-        console.log(
-          require('util').inspect(this.complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 })
-        );
+        this.complexity = {
+          cost: this.complexity.cost + complexityNode[0].cost || 0,
+          extra: allExtra.length ? mergeExtra('sum', ...allExtra) : undefined,
+          tree: (this.complexity.tree || []).concat(complexityNode[0]),
+        };
 
         break;
       case 'mutation':

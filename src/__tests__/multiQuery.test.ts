@@ -54,10 +54,7 @@ it('multi query document', async () => {
     query,
   });
 
-  console.log(require('util').inspect(complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 }));
-
-  expect(true).toBe(false);
-
-  // expect(complexity.extra?.maxTimes['field-Query:test'].maxTimes).toBe(3);
-  // expect(complexity.extra?.maxTimes['field-Query:test'].value).toBe(4);
+  expect(complexity.cost).toBe(42); // 28 + 14
+  expect(complexity.extra?.maxTimes['field-Obj:string'].maxTimes).toBe(5);
+  expect(complexity.extra?.maxTimes['field-Obj:string'].value).toBe(6); // 4 + 2
 });

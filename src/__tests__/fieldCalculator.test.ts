@@ -562,8 +562,6 @@ describe('Basics', () => {
       query,
     });
 
-    // console.log(require('util').inspect(complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 }));
-
     expect(complexity.cost).toBe(8);
   });
 

@@ -70,13 +70,8 @@ export type ComplexityCalculator = (
   options: ComplexityCalculatorArgs
 ) => { cost: number; multiplier: number | null } | { extra: Extra } | void;
 
-// TODO: Not all of these are used, are they? Fix
 export interface QueryComplexityOptions {
-  // The query variables. This is needed because the variables are not available
-  // in the visitor of the graphql-js library
   variables?: Record<string, any>;
-  // specify operation name only when pass multi-operation documents
-  operationName?: string;
   calculators: Array<ComplexityCalculator>;
 }
 
@@ -87,7 +82,6 @@ export type ComplexityOptions = {
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
-  operationName?: string;
   errorChecks?: ErrorCheck[];
   onParseError?: (error: unknown, errors: GraphQLError[]) => void;
 };
@@ -101,7 +95,6 @@ export function getComplexity(options: ComplexityOptions): Complexity {
     const visitor = new QueryComplexity(context, {
       calculators: options.calculators,
       variables: options.variables,
-      operationName: options.operationName,
     });
 
     visit(options.query, visitWithTypeInfo(typeInfo, visitor));
@@ -277,10 +270,6 @@ class QueryComplexity {
   }
 
   onOperationDefinitionEnter(operation: OperationDefinitionNode): void {
-    if (typeof this.options.operationName === 'string' && this.options.operationName !== operation.name?.value) {
-      return;
-    }
-
     const variableValues = getVariableValues(
       this.context.getSchema(),
       operation.variableDefinitions ?? [],

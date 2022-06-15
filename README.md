@@ -74,16 +74,13 @@ import {
   fieldCalculator,
   objectCalculator,
   maxCallErrorCheck,
-  createMaxCostErrorCheck
+  createMaxCostErrorCheck,
 } from '@tv4/graphql-advanced-query-complexity';
 
 export const objectDirective = createObjectDirective();
 export const fieldDirective = createFieldDirective();
 
-const calculators = [
-  objectCalculator({ directive: objectDirective }),
-  fieldCalculator({ directive: fieldDirective }),
-];
+const calculators = [objectCalculator({ directive: objectDirective }), fieldCalculator({ directive: fieldDirective })];
 
 const queryComplexityPlugin: ApolloServerPlugin<Context> = {
   requestDidStart: async () => ({
@@ -97,16 +94,8 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
         schema,
         query: parse(request.query),
         variables: request.variables,
-        errorChecks: [
-          maxCallErrorCheck,
-          createMaxCostErrorCheck({ maxCost: 6 })
-        ],
-        onParseError: (_error) => {},
-
-
-        // TODO FIX THESE
-        variables?: Record<string, any>;
-        operationName?: string;
+        errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 6 })],
+        // onParseError: (_error) => {},
       });
 
       console.log(complexity);
@@ -229,7 +218,6 @@ type ComplexityOptions = {
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
-  operationName?: string;
   errorChecks?: ErrorCheck[];
   onParseError?: (error: unknown, errors: GraphQLError[]) => void;
 };
@@ -242,8 +230,6 @@ Incoming query variables, in Apollo Server, set to
 ```ts
 variables: request.variables;
 ```
-
-#### TODO operationName
 
 #### `errorChecks`
 

@@ -199,7 +199,7 @@ type Query {
 }
 ```
 
-## Calculators
+### Calculators
 
 The default calculators take the corresponding directive as parameters.
 

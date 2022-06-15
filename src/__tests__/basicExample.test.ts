@@ -2,7 +2,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
 
-import { getComplexity } from '..';
+import { getComplexity, maxCallErrorCheck, createMaxCostErrorCheck } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
 import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '..';
@@ -81,7 +81,10 @@ it('basic example 2', async () => {
     calculators,
     schema,
     query,
+    errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 5 })],
   });
+
+  console.log(require('util').inspect(complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 }));
 
   expect(complexity.extra?.maxCalls['type-Obj'].max).toBe(3);
   expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);

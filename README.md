@@ -103,14 +103,12 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
         onValidationError: (_error) => {},
 
 
-                // TODO FIX THESE
+        // TODO FIX THESE
         variables?: Record<string, any>;
         operationName?: string;
       });
 
-      console.log(
-        require('util').inspect(complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 })
-      );
+      console.log(complexity);
 
       return Promise.resolve();
     },
@@ -177,17 +175,38 @@ As we added a `console.log` statement to our Apollo server plugin this is now pr
 ```json
 {
   "cost": 28,
-  "extra": {
-    "maxCalls": {
-      "type-Obj": {
-        "max": 3,
-        "value": 4
-      }
-    }
-  }
+  "extra": { "maxCalls": { "type-Obj": { "max": 3, "value": 4 } } },
+  "errors": [
+    "GraphQLError: type Obj may only be queried 3 times. Was queried 4 times",
+    "GraphQLError: Query is to complex. This query cost is 28 and max cost is 5."
+  ]
 }
 ```
 
+The errors are instances of `GraphQLError`.
+
 ### Act on the results.
 
-By default
+`@tv4/graphql-advanced-query-complexity` does not do anything with the results. It's up to you to act on them. E.g. you might want to log the `cost` or `errors` to a tracing tool. Or probably throw any errors in the `errors` array, and that way block execution of the query.
+
+## Settings
+
+### Directives and calculators
+
+This package exports two default directives and calculators. You're also free to write your own.
+
+The directives take an optional name, which is what you will use it in your schema file.
+
+```ts
+createFieldDirective({ name: 'complexity' });
+createObjectDirective({ name: 'objComplexity' });
+```
+
+```gql
+type Obj @objComplexity(maxTimes: 10) {}
+type Query {
+  field: String @complexity(maxTimes: 10)
+}
+```
+
+`@tv4/graphql-advanced-query-complexity`

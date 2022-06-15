@@ -100,7 +100,7 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
           maxCallErrorCheck,
           createMaxCostErrorCheck({ maxCost: 6 })
         ],
-        onValidationError: (_error) => {},
+        onParseError: (_error) => {},
 
 
         // TODO FIX THESE
@@ -175,7 +175,7 @@ As we added a `console.log` statement to our Apollo server plugin this is now pr
 ```json
 {
   "cost": 28,
-  "extra": { "maxCalls": { "type-Obj": { "max": 3, "value": 4 } } },
+  "extra": { "maxTimes": { "type-Obj": { "max": 3, "value": 4 } } },
   "errors": [
     "GraphQLError: type Obj may only be queried 3 times. Was queried 4 times",
     "GraphQLError: Query is to complex. This query cost is 28 and max cost is 5."
@@ -189,11 +189,11 @@ The errors are instances of `GraphQLError`.
 
 `@tv4/graphql-advanced-query-complexity` does not do anything with the results. It's up to you to act on them. E.g. you might want to log the `cost` or `errors` to a tracing tool. Or probably throw any errors in the `errors` array, and that way block execution of the query.
 
-## Settings
-
-### Directives and calculators
+## Usage
 
 This package exports two default directives and calculators. You're also free to write your own.
+
+### Directives
 
 The directives take an optional name, which is what you will use it in your schema file.
 
@@ -209,4 +209,79 @@ type Query {
 }
 ```
 
-`@tv4/graphql-advanced-query-complexity`
+## Calculators
+
+The default calculators take the corresponding directive as parameters.
+
+```ts
+objectCalculator({ directive: createObjectDirective() });
+fieldCalculator({ directive: createFieldDirective() });
+```
+
+## `getComplexity`
+
+### Parameters
+
+```ts
+type ComplexityOptions = {
+  calculators: ComplexityCalculator[];
+  schema: GraphQLSchema;
+  query: DocumentNode;
+  variables?: Record<string, any>;
+  operationName?: string;
+  errorChecks?: ErrorCheck[];
+  onParseError?: (error: unknown, errors: GraphQLError[]) => void;
+};
+```
+
+#### TODO variables
+
+#### TODO operationName
+
+#### `errorChecks`
+
+By default, the `graphql-advanced-query-complexity` does not _do_ anything with the results. It simply calculates all values. You may however provide an `errorCheck` which will check the results and possibly write one or many errors to the `errors` field of the output.
+
+Two default error checks are provided, `maxCallErrorCheck` which will create errors if `maxTimes` is passed and `createMaxCostErrorCheck` which will create an error if the cost of the query is over your limit.
+
+```ts
+errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 6 })];
+```
+
+#### `onParseError`
+
+```
+onParseError?: (error: unknown, errors: GraphQLError[]) => void;
+```
+
+It may happen that no complexity can be calculated, most probably because of some error in the query. If you want to act on this, then `onParseError` may be used. The current error is passed as `error` and the errors collection as `errors`. You may push to this array inside your `onParseError` handler.
+
+### Output
+
+The output from `getComplexity` looks like this.
+
+```ts
+type Complexity = {
+  cost: number;
+  extra?: Record<string, any>;
+  errors?: GraphQLError[];
+  getTree: () => ComplexityNode | null;
+};
+```
+
+- `cost` is the complete cost of the query
+
+- `extra` is an arbitrary record your calculators may write to for individual nodes. This record is merged (and values are summed/maxed) to give a final record. Example using the built in calculators for "maxTimes":
+
+  ```json
+  {
+    "extra": {
+      "maxTimes": {
+        "type-Obj": { "max": 3, "value": 4 }
+      }
+    }
+  }
+  ```
+
+- `errors` is a list of errors that your `errorChecks` have created. Typically you'll want to throw these (or the first) errors, and block execution of the query.
+- `getTree()` can be used for development purposes to get the entire traversed tree of calculated values.

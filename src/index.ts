@@ -280,8 +280,6 @@ class QueryComplexity {
       return;
     }
 
-    // Get variable values from variables that are passed from options, merged
-    // with default values defined in the operation
     const variableValues = getVariableValues(
       this.context.getSchema(),
       operation.variableDefinitions ?? [],
@@ -333,6 +331,11 @@ class QueryComplexity {
           extra: complexityNode[0].extra,
           tree: complexityNode[0],
         };
+
+        console.log(
+          require('util').inspect(this.complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 })
+        );
+
         break;
       case 'mutation':
         // TODO: Add

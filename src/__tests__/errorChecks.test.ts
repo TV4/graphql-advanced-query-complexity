@@ -32,7 +32,7 @@ it('type queried to many times', async () => {
       obj4: Obj
     }
 
-    type Obj @objComplexity(max: 3) {
+    type Obj @objComplexity(maxTimes: 3) {
       string: String
     }
   `;

@@ -868,7 +868,7 @@ describe('maxItems on field', () => {
       ${objectDirectiveSDL}
 
       type Query {
-        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", max: 3)
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", maxTimes: 3)
       }
 
       type Obj {
@@ -894,7 +894,7 @@ describe('maxItems on field', () => {
       query,
     });
 
-    expect(complexity.extra?.maxCalls['field-Query:test'].max).toBe(3);
+    expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
     expect(complexity.extra?.maxCalls['field-Query:test'].value).toBe(4);
   });
 
@@ -908,7 +908,7 @@ describe('maxItems on field', () => {
       }
 
       type Main {
-        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", max: 3)
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", maxTimes: 3)
       }
 
       type Obj {
@@ -936,7 +936,7 @@ describe('maxItems on field', () => {
       query,
     });
 
-    expect(complexity.extra?.maxCalls['field-Main:test'].max).toBe(3);
+    expect(complexity.extra?.maxCalls['field-Main:test'].maxTimes).toBe(3);
     expect(complexity.extra?.maxCalls['field-Main:test'].value).toBe(4);
   });
 });

@@ -17,11 +17,11 @@ export const objectCalculator = (options: { directive: GraphQLDirective }): Comp
       return;
     }
 
-    if (directiveValues.max) {
+    if (directiveValues.maxTimes) {
       const extra: Extra = {
         maxCalls: {
           [`type-${args.fieldTypeName}`]: {
-            max: directiveValues.max,
+            maxTimes: directiveValues.maxTimes,
             value: 1,
           },
         },

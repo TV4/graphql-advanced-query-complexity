@@ -21,7 +21,7 @@ it('basic example', async () => {
     ${objectDirectiveSDL}
 
     type Query {
-      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", max: 3)
+      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", maxTimes: 3)
     }
 
     type Obj {
@@ -47,7 +47,7 @@ it('basic example', async () => {
     query,
   });
 
-  expect(complexity.extra?.maxCalls['field-Query:test'].max).toBe(3);
+  expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
   expect(complexity.extra?.maxCalls['field-Query:test'].value).toBe(4);
 });
 
@@ -60,7 +60,7 @@ it('basic example 2', async () => {
       complexityExample(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
     }
 
-    type Obj @objComplexity(max: 3) {
+    type Obj @objComplexity(maxTimes: 3) {
       string: String @complexity(cost: 7)
     }
   `;
@@ -84,8 +84,6 @@ it('basic example 2', async () => {
     errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 5 })],
   });
 
-  console.log(require('util').inspect(complexity, { showHidden: true, depth: null, colors: true, breakLength: 200 }));
-
-  expect(complexity.extra?.maxCalls['type-Obj'].max).toBe(3);
+  expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
   expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
 });

@@ -88,14 +88,14 @@ export type ComplexityOptions = {
   variables?: Record<string, any>;
   operationName?: string;
   errorChecks?: ErrorCheck[];
-  onValidationError?: (error: unknown) => void;
+  onParseError?: (error: unknown, errors: GraphQLError[]) => void;
 };
 
 export function getComplexity(options: ComplexityOptions): Complexity {
+  const errors: GraphQLError[] = [];
+
   try {
     const typeInfo = new TypeInfo(options.schema);
-
-    const errors: GraphQLError[] = [];
     const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
     const visitor = new QueryComplexity(context, {
       calculators: options.calculators,
@@ -119,11 +119,12 @@ export function getComplexity(options: ComplexityOptions): Complexity {
       getTree: () => visitor.complexity.tree,
     };
   } catch (error) {
-    if (options.onValidationError) {
-      options.onValidationError(error);
+    if (options.onParseError) {
+      options.onParseError(error, errors);
     }
     return {
       cost: 0,
+      errors,
       getTree: () => null,
     };
   }

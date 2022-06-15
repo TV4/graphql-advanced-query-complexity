@@ -47,8 +47,8 @@ it('basic example', async () => {
     query,
   });
 
-  expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
-  expect(complexity.extra?.maxCalls['field-Query:test'].value).toBe(4);
+  expect(complexity.extra?.maxTimes['field-Query:test'].maxTimes).toBe(3);
+  expect(complexity.extra?.maxTimes['field-Query:test'].value).toBe(4);
 });
 
 it('basic example 2', async () => {
@@ -84,6 +84,6 @@ it('basic example 2', async () => {
     errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 5 })],
   });
 
-  expect(complexity.extra?.maxCalls['type-Obj'].maxTimes).toBe(3);
-  expect(complexity.extra?.maxCalls['type-Obj'].value).toBe(4);
+  expect(complexity.extra?.maxTimes['type-Obj'].maxTimes).toBe(3);
+  expect(complexity.extra?.maxTimes['type-Obj'].value).toBe(4);
 });

@@ -19,7 +19,7 @@ export const objectCalculator = (options: { directive: GraphQLDirective }): Comp
 
     if (directiveValues.maxTimes) {
       const extra: Extra = {
-        maxCalls: {
+        maxTimes: {
           [`type-${args.fieldTypeName}`]: {
             maxTimes: directiveValues.maxTimes,
             value: 1,

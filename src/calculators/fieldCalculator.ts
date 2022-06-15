@@ -22,7 +22,7 @@ export const fieldCalculator = (options: { directive: GraphQLDirective }): Compl
 
     const extra: Extra | undefined = directiveValues.maxTimes
       ? {
-          maxCalls: {
+          maxTimes: {
             [`field-${args.type.name}:${args.field.name}`]: {
               maxTimes: directiveValues.maxTimes,
               value: 1,

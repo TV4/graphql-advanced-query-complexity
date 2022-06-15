@@ -894,8 +894,8 @@ describe('maxItems on field', () => {
       query,
     });
 
-    expect(complexity.extra?.maxCalls['field-Query:test'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['field-Query:test'].value).toBe(4);
+    expect(complexity.extra?.maxTimes['field-Query:test'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxTimes['field-Query:test'].value).toBe(4);
   });
 
   it('deep object', async () => {
@@ -936,7 +936,7 @@ describe('maxItems on field', () => {
       query,
     });
 
-    expect(complexity.extra?.maxCalls['field-Main:test'].maxTimes).toBe(3);
-    expect(complexity.extra?.maxCalls['field-Main:test'].value).toBe(4);
+    expect(complexity.extra?.maxTimes['field-Main:test'].maxTimes).toBe(3);
+    expect(complexity.extra?.maxTimes['field-Main:test'].value).toBe(4);
   });
 });

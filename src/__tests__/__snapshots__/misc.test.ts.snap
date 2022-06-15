@@ -19,7 +19,7 @@ Object {
   ],
   "cost": 28,
   "extra": Object {
-    "maxCalls": Object {
+    "maxTimes": Object {
       "field-Query:test": Object {
         "maxTimes": 3,
         "value": 4,

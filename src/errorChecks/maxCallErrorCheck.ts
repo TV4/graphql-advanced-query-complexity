@@ -4,24 +4,24 @@ import { ErrorCheck } from '..';
 import { isNumber } from '../utils';
 
 export const maxCallErrorCheck: ErrorCheck = (complexity) => {
-  const maxCalls = complexity.extra?.maxCalls;
+  const maxTimes = complexity.extra?.maxTimes;
 
-  if (!maxCalls) {
+  if (!maxTimes) {
     return;
   }
 
   const errors: GraphQLError[] = [];
 
-  for (const key in maxCalls) {
-    if (Object.prototype.hasOwnProperty.call(maxCalls, key)) {
-      const maxTimes = maxCalls[key]?.maxTimes;
-      const value = maxCalls[key]?.value;
+  for (const key in maxTimes) {
+    if (Object.prototype.hasOwnProperty.call(maxTimes, key)) {
+      const max = maxTimes[key]?.maxTimes;
+      const value = maxTimes[key]?.value;
 
-      if (isNumber(maxTimes) && isNumber(value) && value > maxTimes) {
+      if (isNumber(max) && isNumber(value) && value > max) {
         const [type, actualKey] = key.split('-');
 
         errors.push(
-          new GraphQLError(`${type} ${actualKey} may only be queried ${maxTimes} times. Was queried ${value} times`, {
+          new GraphQLError(`${type} ${actualKey} may only be queried ${max} times. Was queried ${value} times`, {
             extensions: { complexity: { code: 'TYPE_CALLED_TO_MANY_TIMES' } },
           })
         );

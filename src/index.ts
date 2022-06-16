@@ -32,6 +32,7 @@ import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
 import { createSDLFromDirective, isBoolean, nonNullable } from './utils';
 import { mergeExtra } from './mergeExtra';
+import { createServicesPostCalculation } from './postCalculation/servicesPostCalculation';
 
 export {
   fieldCalculator,
@@ -41,6 +42,7 @@ export {
   createFieldDirective,
   maxCallErrorCheck,
   createMaxCostErrorCheck,
+  createServicesPostCalculation,
 };
 
 export type ComplexityNode = {
@@ -75,7 +77,8 @@ export interface QueryComplexityOptions {
   calculators: Array<ComplexityCalculator>;
 }
 
-export type ErrorCheck = (complexity: ComplexityCollector) => GraphQLError[] | void;
+export type ErrorCheck = (complexity: ComplexityCollector) => GraphQLError[] | void; // TODO: Change to void, to be mutating
+export type PostCalculation = (complexity: ComplexityCollector) => void;
 
 export type ComplexityOptions = {
   calculators: ComplexityCalculator[];
@@ -83,6 +86,7 @@ export type ComplexityOptions = {
   query: DocumentNode;
   variables?: Record<string, any>;
   errorChecks?: ErrorCheck[];
+  postCalculations?: PostCalculation[];
   onParseError?: (error: unknown, errors: GraphQLError[]) => void;
 };
 
@@ -99,11 +103,19 @@ export function getComplexity(options: ComplexityOptions): Complexity {
 
     visit(options.query, visitWithTypeInfo(typeInfo, visitor));
 
+    for (const postCalculation of options?.postCalculations || []) {
+      postCalculation(visitor.complexity);
+    }
+
     for (const errorCheck of options?.errorChecks || []) {
       const maybeErrors = errorCheck(visitor.complexity);
       if (maybeErrors?.length) {
         errors.push(...maybeErrors);
       }
+    }
+
+    for (const complexityErrors of visitor.complexity.errors || []) {
+      errors.push(complexityErrors);
     }
 
     return {

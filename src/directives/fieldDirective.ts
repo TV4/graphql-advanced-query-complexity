@@ -1,4 +1,12 @@
-import { DirectiveLocation, GraphQLDirective, GraphQLInputType, GraphQLInt, GraphQLString } from 'graphql';
+import {
+  DirectiveLocation,
+  GraphQLDirective,
+  GraphQLInputType,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 
 type TypeComplexityDirectiveOptions = {
   name?: string;
@@ -8,6 +16,7 @@ type CustomComplexityOptions = {
   multiplier?: string;
   cost?: number;
   maxTimes?: number;
+  services?: string[];
 };
 
 const DEFAULT_COMPLEXITY_NAME = 'complexity';
@@ -31,6 +40,10 @@ export const createFieldDirective = (options?: TypeComplexityDirectiveOptions): 
     maxTimes: {
       type: GraphQLInt,
       description: 'Max time this type can be requested in a single query',
+    },
+    services: {
+      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      description: 'Services resolvement of this calls',
     },
   };
 

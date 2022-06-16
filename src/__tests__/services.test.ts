@@ -26,7 +26,7 @@ it('called once with cost', async () => {
     ${objectDirectiveSDL}
 
     type Query {
-      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", services: ["engagement"])
+      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
     }
 
     type Obj @objComplexity(services: ["engagement"]) {
@@ -70,7 +70,7 @@ it('called multiple times with cost', async () => {
     ${objectDirectiveSDL}
 
     type Query {
-      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", services: ["engagement"])
+      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
     }
 
     type Obj @objComplexity(services: ["engagement"]) {
@@ -113,7 +113,7 @@ it('max times, creates error', async () => {
     ${objectDirectiveSDL}
 
     type Query {
-      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount", services: ["engagement"])
+      test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
     }
 
     type Obj @objComplexity(services: ["engagement"]) {

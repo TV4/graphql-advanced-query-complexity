@@ -65,6 +65,85 @@ describe('object directive', () => {
     expect(complexity.cost).toBe(100);
   });
 
+  it('multiple services', async () => {
+    const baseSchema = gql`
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
+
+      type Query {
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
+      }
+
+      type Obj {
+        obj1: Obj1
+        obj2: Obj2
+        obj3: Obj3
+      }
+
+      type Obj1 @objComplexity(services: ["serviceX"]) {
+        string: String
+      }
+
+      type Obj2 @objComplexity(services: ["serviceX", "serviceY"]) {
+        string: String
+      }
+
+      type Obj3 @objComplexity(services: ["serviceZ", "serviceY"]) {
+        string: String
+      }
+    `;
+
+    const query = gql`
+      query {
+        test(amount: 4) {
+          obj1 {
+            string
+          }
+          obj2 {
+            string
+          }
+          obj3 {
+            string
+          }
+        }
+      }
+    `;
+
+    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+    expect(validationResults).toEqual([]);
+
+    const complexity = getComplexity({
+      calculators,
+      schema,
+      query,
+      postCalculations: [
+        createServicesPostCalculation({
+          serviceX: {
+            cost: 100,
+          },
+          serviceY: {
+            calledOnce: true,
+            cost: 1000,
+          },
+          serviceZ: {
+            cost: 10000,
+          },
+        }),
+      ],
+    });
+
+    /**
+     * obj1 uses serviceX: 4 * 100 = 400
+     * obj2 uses serviceX: 4 * 100 = 400, and serviceY
+     * obj3 uses serviceZ: 4 * 10 000 = 40000, and serviceY
+     * serviceY is marked ass calledOnce, and one call is 1000
+     *
+     * sum: 41800
+     */
+    expect(complexity.cost).toBe(41800);
+  });
+
   it('called multiple times with cost', async () => {
     const baseSchema = gql`
       ${fieldDirectiveSDL}
@@ -360,6 +439,10 @@ describe('field directive', () => {
       ],
     });
 
-    expect(complexity.cost).toBe(880); // 4 * 100 + 4 * 100  + 4 * 20
+    /**
+     * string is called 4 times and uses serviceX = 4 * 100
+     * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
+     */
+    expect(complexity.cost).toBe(880);
   });
 });

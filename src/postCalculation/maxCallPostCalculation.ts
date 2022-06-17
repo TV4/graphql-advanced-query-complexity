@@ -1,9 +1,9 @@
 import { GraphQLError } from 'graphql';
+import { PostCalculation } from '..';
 
-import { ErrorCheck } from '..';
 import { isNumber } from '../utils';
 
-export const maxCallErrorCheck: ErrorCheck = (complexity) => {
+export const maxCallPostCalculation: PostCalculation = (complexity) => {
   const maxTimes = complexity.extra?.maxTimes;
 
   if (!maxTimes) {

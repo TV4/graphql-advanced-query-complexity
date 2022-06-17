@@ -1,9 +1,8 @@
+import { PostCalculation } from '..';
 import { GraphQLError } from 'graphql';
 
-import { ErrorCheck } from '..';
-
-export const createMaxCostErrorCheck =
-  ({ maxCost }: { maxCost: number }): ErrorCheck =>
+export const createMaxCostPostCalculation =
+  ({ maxCost }: { maxCost: number }): PostCalculation =>
   (complexity) => {
     if (complexity.cost > maxCost) {
       complexity.errors.push(

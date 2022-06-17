@@ -6,7 +6,7 @@ import { getComplexity } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
 import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '..';
-import { maxCallErrorCheck, createMaxCostErrorCheck } from '..';
+import { maxCallPostCalculation, createMaxCostPostCalculation } from '..';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());
@@ -64,7 +64,7 @@ it('type queried to many times', async () => {
     calculators,
     schema,
     query,
-    errorChecks: [maxCallErrorCheck], // <-- This is causing errors
+    postCalculations: [maxCallPostCalculation], // <-- This is causing errors
   });
 
   expect(complexity.errors?.length).toBe(1);
@@ -95,7 +95,7 @@ it('over cost', async () => {
     calculators,
     schema,
     query,
-    errorChecks: [createMaxCostErrorCheck({ maxCost: 6 })], // <-- This is causing errors
+    postCalculations: [createMaxCostPostCalculation({ maxCost: 6 })], // <-- This is causing errors
   });
 
   expect(complexity.errors?.length).toBe(1);

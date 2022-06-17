@@ -73,8 +73,8 @@ import {
   getComplexity,
   fieldCalculator,
   objectCalculator,
-  maxCallErrorCheck,
-  createMaxCostErrorCheck,
+  maxCallPostCalculation,
+  createMaxCostPostCalculation,
 } from '@tv4/graphql-advanced-query-complexity';
 
 export const objectDirective = createObjectDirective();
@@ -94,7 +94,7 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
         schema,
         query: parse(request.query),
         variables: request.variables,
-        errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 6 })],
+        postCalculations: [maxCallPostCalculation, createMaxCostPostCalculation({ maxCost: 6 })],
         // onParseError: (_error) => {},
       });
 
@@ -218,7 +218,6 @@ type ComplexityOptions = {
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
-  errorChecks?: ErrorCheck[];
   onParseError?: (error: unknown, errors: GraphQLError[]) => void;
 };
 ```
@@ -231,14 +230,14 @@ Incoming query variables, in Apollo Server, set to
 variables: request.variables;
 ```
 
-#### `errorChecks`
+#### `postCalculations`
 
-By default, the `graphql-advanced-query-complexity` does not _do_ anything with the results. It simply calculates all values. You may however provide an `errorCheck` which will check the results and possibly write one or many errors to the `errors` field of the output.
+By default, the `graphql-advanced-query-complexity` does not _do_ anything with the results. It simply calculates all values. You may however provide a "post calculation" which will check the results and possibly write one or many errors to the `errors` field of the output. A post calculation may modify any part of the calculated complexity.
 
-Two default error checks are provided, `maxCallErrorCheck` which will create errors if `maxTimes` is passed and `createMaxCostErrorCheck` which will create an error if the cost of the query is over your limit.
+Two default post calculators are provided, `maxCallPostCalculation` which will create errors if `maxTimes` is passed and `createMaxCostPostCalculation` which will create an error if the cost of the query is over your limit.
 
 ```ts
-errorChecks: [maxCallErrorCheck, createMaxCostErrorCheck({ maxCost: 6 })];
+postCalculations: [maxCallPostCalculation, createMaxCostPostCalculation({ maxCost: 6 })];
 ```
 
 #### `onParseError`

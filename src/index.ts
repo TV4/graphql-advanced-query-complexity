@@ -1,4 +1,3 @@
-import { createMaxCostErrorCheck } from './errorChecks/maxCostErrorCheck';
 import {
   DocumentNode,
   FieldNode,
@@ -26,13 +25,14 @@ import { objectCalculator } from './calculators/objectCalculator';
 import { GetNodeComplexity } from './commonTypes';
 import { createFieldDirective } from './directives/fieldDirective';
 import { createObjectDirective } from './directives/objectDirective';
-import { maxCallErrorCheck } from './errorChecks/maxCallErrorCheck';
+import { maxCallPostCalculation } from './postCalculation/maxCallPostCalculation';
 import { handleField } from './handleField';
 import { handleFragmentSpread } from './handleFragmentSpread';
 import { handleInlineFragment } from './handleInlineFragment';
 import { createSDLFromDirective, isBoolean, nonNullable } from './utils';
 import { mergeExtra } from './mergeExtra';
 import { createServicesPostCalculation } from './postCalculation/servicesPostCalculation';
+import { createMaxCostPostCalculation } from './postCalculation/maxCostPostCalculation';
 
 export {
   fieldCalculator,
@@ -40,8 +40,8 @@ export {
   createSDLFromDirective,
   createObjectDirective,
   createFieldDirective,
-  maxCallErrorCheck,
-  createMaxCostErrorCheck,
+  maxCallPostCalculation,
+  createMaxCostPostCalculation,
   createServicesPostCalculation,
 };
 
@@ -77,7 +77,6 @@ export interface QueryComplexityOptions {
   calculators: Array<ComplexityCalculator>;
 }
 
-export type ErrorCheck = (complexity: ComplexityCollector) => void;
 export type PostCalculation = (complexity: ComplexityCollector) => void;
 
 export type ComplexityOptions = {
@@ -85,7 +84,6 @@ export type ComplexityOptions = {
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
-  errorChecks?: ErrorCheck[];
   postCalculations?: PostCalculation[];
   onParseError?: (error: unknown, errors: GraphQLError[]) => void;
 };
@@ -105,10 +103,6 @@ export function getComplexity(options: ComplexityOptions): Complexity {
 
     for (const postCalculation of options?.postCalculations || []) {
       postCalculation(visitor.complexity);
-    }
-
-    for (const errorCheck of options?.errorChecks || []) {
-      errorCheck(visitor.complexity);
     }
 
     for (const complexityErrors of visitor.complexity.errors || []) {

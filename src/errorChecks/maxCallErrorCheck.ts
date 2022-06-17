@@ -10,8 +10,6 @@ export const maxCallErrorCheck: ErrorCheck = (complexity) => {
     return;
   }
 
-  const errors: GraphQLError[] = [];
-
   for (const key in maxTimes) {
     if (Object.prototype.hasOwnProperty.call(maxTimes, key)) {
       const max = maxTimes[key]?.maxTimes;
@@ -20,7 +18,7 @@ export const maxCallErrorCheck: ErrorCheck = (complexity) => {
       if (isNumber(max) && isNumber(value) && value > max) {
         const [type, actualKey] = key.split('-');
 
-        errors.push(
+        complexity.errors.push(
           new GraphQLError(`${type} ${actualKey} may only be queried ${max} times. Was queried ${value} times`, {
             extensions: { complexity: { code: 'TYPE_CALLED_TO_MANY_TIMES' } },
           })
@@ -28,6 +26,4 @@ export const maxCallErrorCheck: ErrorCheck = (complexity) => {
       }
     }
   }
-
-  return errors.length ? errors : undefined;
 };

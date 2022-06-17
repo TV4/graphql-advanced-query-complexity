@@ -77,7 +77,7 @@ export interface QueryComplexityOptions {
   calculators: Array<ComplexityCalculator>;
 }
 
-export type ErrorCheck = (complexity: ComplexityCollector) => GraphQLError[] | void; // TODO: Change to void, to be mutating
+export type ErrorCheck = (complexity: ComplexityCollector) => void;
 export type PostCalculation = (complexity: ComplexityCollector) => void;
 
 export type ComplexityOptions = {
@@ -108,10 +108,7 @@ export function getComplexity(options: ComplexityOptions): Complexity {
     }
 
     for (const errorCheck of options?.errorChecks || []) {
-      const maybeErrors = errorCheck(visitor.complexity);
-      if (maybeErrors?.length) {
-        errors.push(...maybeErrors);
-      }
+      errorCheck(visitor.complexity);
     }
 
     for (const complexityErrors of visitor.complexity.errors || []) {

@@ -43,11 +43,7 @@ export const createServicesPostCalculation =
           }
         );
 
-        if (complexity.errors) {
-          complexity.errors.push(overLimitError);
-        } else {
-          complexity.errors = [overLimitError];
-        }
+        complexity.errors.push(overLimitError);
       }
     }
   };

@@ -240,7 +240,7 @@ const getChilds: GetNodeComplexity = ({
 export type Complexity = {
   cost: number;
   extra: Extra;
-  errors?: GraphQLError[];
+  errors: GraphQLError[];
   getTree: () => ComplexityNode[] | null;
 };
 
@@ -248,7 +248,7 @@ export type ComplexityCollector = {
   cost: number;
   tree: ComplexityNode[] | null;
   extra: Extra;
-  errors?: GraphQLError[];
+  errors: GraphQLError[];
 };
 
 class QueryComplexity {
@@ -263,7 +263,7 @@ class QueryComplexity {
 
   constructor(context: ValidationContext, options: QueryComplexityOptions) {
     this.context = context;
-    this.complexity = { cost: 0, tree: null, extra: {} };
+    this.complexity = { cost: 0, tree: null, extra: {}, errors: [] };
     this.options = options;
     this.calculators = options.calculators;
     this.variableValues = {};
@@ -335,6 +335,7 @@ class QueryComplexity {
           cost: this.complexity.cost + complexityNode[0].cost || 0,
           extra: allExtra.length ? mergeExtra('sum', ...allExtra) : {},
           tree: (this.complexity.tree || []).concat(complexityNode[0]),
+          errors: [],
         };
 
         break;

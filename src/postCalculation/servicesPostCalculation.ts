@@ -15,7 +15,7 @@ type ServicesPostCalculationArgs = Record<
 export const createServicesPostCalculation =
   (servicesConfig: ServicesPostCalculationArgs): PostCalculation =>
   (complexity) => {
-    const servicesDataMap = complexity.extra?.services as ComplexityServices;
+    const servicesDataMap = complexity.extra.services as ComplexityServices;
 
     if (!servicesDataMap) {
       return;

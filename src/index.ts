@@ -22,7 +22,7 @@ import { getDirectiveValues, getVariableValues } from 'graphql/execution/values'
 import { fieldCalculator } from './calculators/fieldCalculator';
 import { objectCalculator } from './calculators/objectCalculator';
 
-import { GetNodeComplexity } from './commonTypes';
+import { ComplexityCalculatorAccumulator, GetNodeComplexity } from './commonTypes';
 import { createFieldDirective } from './directives/fieldDirective';
 import { createObjectDirective } from './directives/objectDirective';
 import { maxCallPostCalculation } from './postCalculation/maxCallPostCalculation';
@@ -33,13 +33,17 @@ import { createSDLFromDirective, isBoolean, nonNullable } from './utils';
 import { mergeExtra } from './mergeExtra';
 import { createServicesPostCalculation } from './postCalculation/servicesPostCalculation';
 import { createMaxCostPostCalculation } from './postCalculation/maxCostPostCalculation';
+import { createSingleCallServicesDirective } from './directives/singleCallServicesDirective';
+import { singleCallServicesObjectCalculator } from './calculators/singleCallServicesObjectCalculator';
 
 export {
   fieldCalculator,
   objectCalculator,
+  singleCallServicesObjectCalculator,
   createSDLFromDirective,
   createObjectDirective,
   createFieldDirective,
+  createSingleCallServicesDirective,
   maxCallPostCalculation,
   createMaxCostPostCalculation,
   createServicesPostCalculation,
@@ -69,7 +73,8 @@ export type ComplexityCalculatorArgs = {
 export type Extra = Record<string, any>;
 
 export type ComplexityCalculator = (
-  options: ComplexityCalculatorArgs
+  options: ComplexityCalculatorArgs,
+  accumulator: ComplexityCalculatorAccumulator
 ) => { cost: number; multiplier: number | null } | { extra: Extra } | void;
 
 export interface QueryComplexityOptions {

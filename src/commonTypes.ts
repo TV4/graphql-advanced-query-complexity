@@ -11,7 +11,7 @@ import {
   InlineFragmentNode,
   OperationDefinitionNode,
 } from 'graphql';
-import { ComplexityCalculator, ComplexityNode } from '.';
+import { ComplexityCalculator, ComplexityNode, Extra } from '.';
 
 export type NodeComplexityBase = {
   typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
@@ -33,3 +33,9 @@ export type GetNodeComplexity = (
     node: FieldNode | FragmentDefinitionNode | InlineFragmentNode | OperationDefinitionNode;
   }
 ) => ComplexityNode[] | null;
+
+export type ComplexityCalculatorAccumulator = {
+  cost: number;
+  multiplier: number | null;
+  extra: Extra;
+};

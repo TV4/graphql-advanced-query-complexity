@@ -1,3 +1,4 @@
+import { updateExtra } from './shared/updaters';
 import { getDirectiveValues, GraphQLDirective } from 'graphql';
 
 import { ComplexityCalculator, Extra } from '..';
@@ -5,7 +6,7 @@ import { ComplexityCalculator, Extra } from '..';
 export type ComplexityServices = Record<string, { value: number }>;
 
 export const objectCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
-  return (args) => {
+  return (args, accumulator) => {
     const schemaTypeNode = args.schema.getType(args.fieldTypeName);
 
     if (!schemaTypeNode?.astNode) {
@@ -43,6 +44,8 @@ export const objectCalculator = (options: { directive: GraphQLDirective }): Comp
         },
       };
     }
+
+    updateExtra(extra, accumulator);
 
     return { extra };
   };

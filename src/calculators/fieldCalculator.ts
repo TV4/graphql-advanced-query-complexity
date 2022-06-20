@@ -3,13 +3,14 @@ import { getDirectiveValues, GraphQLDirective } from 'graphql';
 import { ComplexityCalculator, Extra } from '..';
 import { isNumber, isString } from '../utils';
 import { ComplexityServices } from './objectCalculator';
+import { updateExtra, updateCost, updateMultiplier } from './shared/updaters';
 
 const getDeep = <T>(obj: Record<any, any>, path: string): T | null => {
   return (path.split('.').reduce((acc, part) => acc && acc[part], obj) || null) as T | null;
 };
 
 export const fieldCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
-  return (args) => {
+  return (args, accumulator) => {
     if (!args.field?.astNode) {
       return;
     }
@@ -49,6 +50,10 @@ export const fieldCalculator = (options: { directive: GraphQLDirective }): Compl
     const cost = isNumber(directiveValues.cost) ? directiveValues.cost : 0;
     const multiplierString = isString(directiveValues.multiplier) ? directiveValues.multiplier : null;
     const multiplier = multiplierString ? getDeep<number>(args.args, multiplierString) || null : null;
+
+    updateMultiplier(multiplier, accumulator);
+    updateExtra(extra, accumulator);
+    updateCost(cost, accumulator);
 
     return { cost, multiplier, extra };
   };

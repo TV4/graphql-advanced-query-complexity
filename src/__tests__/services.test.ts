@@ -1,3 +1,4 @@
+import { createSingleCallServicesDirective } from './../directives/singleCallServicesDirective';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
@@ -8,12 +9,14 @@ import {
   createSDLFromDirective,
   createServicesPostCalculation,
   getComplexity,
+  singleCallServicesObjectCalculator,
 } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());
+const singleCallServicesDirectiveSDL = createSDLFromDirective(createSingleCallServicesDirective());
 
 const calculators = [
   objectCalculator({ directive: createObjectDirective() }),
@@ -425,6 +428,63 @@ describe('field directive', () => {
 
     const complexity = getComplexity({
       calculators,
+      schema,
+      query,
+      postCalculations: [
+        createServicesPostCalculation({
+          serviceX: {
+            cost: 100,
+          },
+          serviceY: {
+            cost: 20,
+          },
+        }),
+      ],
+    });
+
+    /**
+     * string is called 4 times and uses serviceX = 4 * 100
+     * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
+     */
+    expect(complexity.cost).toBe(880);
+  });
+});
+
+describe.only('single call service directive', () => {
+  it('called multiple times, multiple fields, with cost', async () => {
+    const baseSchema = gql`
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
+      ${singleCallServicesDirectiveSDL}
+
+      type Query {
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
+      }
+
+      type Obj @singleCallServices(services: ["serviceX"]) {
+        string: String @complexity(services: ["serviceX"])
+        string2: String @complexity(services: ["serviceX", "serviceY"])
+      }
+    `;
+
+    const query = gql`
+      query {
+        test(amount: 4) {
+          string
+          string2
+        }
+      }
+    `;
+
+    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+    expect(validationResults).toEqual([]);
+
+    const complexity = getComplexity({
+      calculators: [
+        ...calculators,
+        singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+      ],
       schema,
       query,
       postCalculations: [

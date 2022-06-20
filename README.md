@@ -4,14 +4,16 @@ When you need to make rules about how your GraphQL server is allowed to be queri
 
 Main features:
 
+- Objects can be annotated, not just fields.
 - Limit the amount of times an field or an object may be queried
+- Support data loaded/batched data. Even if a field/object is called multiple times, calculate it as one.
 - Calculate complexity based on cost of individual fields or types
 - Take lists into account so that a list of 2 items are calculated twice.
 - Extendable with your own calculators
 
 Although this package does everything [graphql-query-complexity](https://www.npmjs.com/package/graphql-query-complexity) does, and more, for simpler needs, have a look at that one.
 
-## Example schema with directives
+## Simple example
 
 ```gql
 type Query {
@@ -53,6 +55,67 @@ would return:
   - `string` requested 11 times at the cost of 7 per time = 77.
   - `exampleQuery` having a cost of 10.
   - Total cost of 77 + 10 = 87
+
+## Service based (data loaded/batched) example
+
+Imagine this query:
+
+```gql
+query {
+  panel {
+    listOfMovies(limit: 4) {
+      title
+      playback
+    }
+  }
+}
+```
+
+and this schema:
+
+```gql
+type Query {
+  panel: Panel
+}
+
+type Panel {
+  listOfMovies(limit: Int!): [Movie] @complexity(multiplier: "limit")
+}
+
+type Movie @objComplexity(services: ["watched", "mylist"]) {
+  title: String
+  playback: String @complexity(services: ["playback"])
+}
+```
+
+the `Movie` type is annotated with the services `watched` and `mylist`. The `playback` field is annotated with the service `playback`. This can be read as "When a Movie is resolved, it's going to use the services `watched` and `mylist`".
+
+When running the complexity calculator, you can supply data about what these different services means in terms of complexity:
+
+```ts
+const complexity = getComplexity({
+  postCalculations: [
+    createServicesPostCalculation({
+      watched: {
+        calledOnce: true,
+        cost: 70,
+      },
+      mylist: {
+        cost: 10,
+      },
+      playback: {
+        maxTimes: 1,
+      },
+    }),
+  ],
+});
+```
+
+- `calledOnce` means that no matter how many times this service is called, it's going to count as 1 call. E.g. this is a batched call or something that you cache and use throughout the resolvemenet.
+- `cost` every time you call this, this cost is going to be added to the final tally. If `calledOnce` is set to true, then the cost is only going to get inflicted once.
+- `maxTimes` how many times this service may be called in a single query. Use e.g. for fields and types that are only supposed to be called once, and not in a list of items. In this example, the `playback` field is only supposed to be run on-demand for a single movie when the user wants to start a movie, and not as part of the listing of the movies.
+
+TODO CONTINUE HERE
 
 ## Installation
 

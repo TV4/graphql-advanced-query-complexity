@@ -75,7 +75,7 @@ export type Extra = Record<string, any>;
 export type ComplexityCalculator = (
   options: ComplexityCalculatorArgs,
   accumulator: ComplexityCalculatorAccumulator
-) => { cost: number; multiplier: number | null } | { extra: Extra } | void;
+) => void;
 
 export interface QueryComplexityOptions {
   variables?: Record<string, any>;

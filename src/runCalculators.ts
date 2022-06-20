@@ -26,11 +26,7 @@ export const runCalculators = ({
   };
 
   for (const calculator of calculators) {
-    const calculatorValues = calculator(calculatorArgs, accumulator);
-
-    if (!calculatorValues) {
-      continue;
-    }
+    calculator(calculatorArgs, accumulator);
   }
 
   const childComplexity = getChildComplexity(children);

@@ -9,7 +9,6 @@ import {
   createSDLFromDirective,
   createServicesPostCalculation,
   getComplexity,
-  singleCallServicesObjectCalculator,
 } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
@@ -451,8 +450,8 @@ describe('field directive', () => {
   });
 });
 
-describe.only('single call service directive', () => {
-  it('called multiple times, multiple fields, with cost', async () => {
+describe('single call service directive', () => {
+  it('singleCallService on object, direct child', async () => {
     const baseSchema = gql`
       ${fieldDirectiveSDL}
       ${objectDirectiveSDL}
@@ -483,10 +482,7 @@ describe.only('single call service directive', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      calculators: [
-        ...calculators,
-        singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
-      ],
+      calculators,
       schema,
       query,
       extraMerger: createSingleCallServiceExtraMerger({ directive: createSingleCallServicesDirective() }),
@@ -502,9 +498,76 @@ describe.only('single call service directive', () => {
       ],
     });
 
-    // console.log(
-    //   require('util').inspect(complexity.getTree(), { showHidden: true, depth: null, colors: true, breakLength: 200 })
-    // );
+    /**
+     * string is called 4 times and uses serviceX = 4 * 100.
+     * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
+     *
+     * However, serviceX is annotated as @singleCallServices which means that it's only
+     * going to count as 1. So the 4+4 calls, costing 100 each, is only going to be
+     * counted as 1 at the cost of 100.
+     *
+     * So final cost is 100 + 4 * 20.
+     */
+    expect(complexity.cost).toBe(180);
+  });
+
+  it('singleCallService on object, deep nested', async () => {
+    const baseSchema = gql`
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
+      ${singleCallServicesDirectiveSDL}
+
+      type Query {
+        test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
+      }
+
+      type Obj @singleCallServices(services: ["serviceX"]) {
+        obj1: Obj1
+        obj2: Obj2
+      }
+
+      type Obj1 {
+        string: String @complexity(services: ["serviceX"])
+      }
+
+      type Obj2 {
+        string: String @complexity(services: ["serviceX", "serviceY"])
+      }
+    `;
+
+    const query = gql`
+      query {
+        test(amount: 4) {
+          obj1 {
+            string
+          }
+          obj2 {
+            string
+          }
+        }
+      }
+    `;
+
+    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+    expect(validationResults).toEqual([]);
+
+    const complexity = getComplexity({
+      calculators,
+      schema,
+      query,
+      extraMerger: createSingleCallServiceExtraMerger({ directive: createSingleCallServicesDirective() }),
+      postCalculations: [
+        createServicesPostCalculation({
+          serviceX: {
+            cost: 100,
+          },
+          serviceY: {
+            cost: 20,
+          },
+        }),
+      ],
+    });
 
     /**
      * string is called 4 times and uses serviceX = 4 * 100.
@@ -518,4 +581,6 @@ describe.only('single call service directive', () => {
      */
     expect(complexity.cost).toBe(180);
   });
+
+  it.todo('singleCallService on field');
 });

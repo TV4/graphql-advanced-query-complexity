@@ -35,13 +35,11 @@ import { mergeExtra } from './mergeExtra';
 import { createServicesPostCalculation } from './postCalculation/servicesPostCalculation';
 import { createMaxCostPostCalculation } from './postCalculation/maxCostPostCalculation';
 import { createSingleCallServicesDirective } from './directives/singleCallServicesDirective';
-import { singleCallServicesObjectCalculator } from './calculators/singleCallServicesObjectCalculator';
 import { ChildComplexity } from './getChildComplexity';
 
 export {
   fieldCalculator,
   objectCalculator,
-  singleCallServicesObjectCalculator,
   createSDLFromDirective,
   createObjectDirective,
   createFieldDirective,

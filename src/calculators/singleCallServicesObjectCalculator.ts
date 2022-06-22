@@ -1,11 +1,11 @@
 import { getDirectiveValues, GraphQLDirective } from 'graphql';
 
-import { ComplexityCalculator, Extra } from '..';
+import { ComplexityCalculator } from '..';
 
 export type ComplexityServices = Record<string, { value: number }>;
 
 export const singleCallServicesObjectCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
-  return (args) => {
+  return (args, _accumulator, childComplexity) => {
     const schemaTypeNode = args.schema.getType(args.fieldTypeName);
 
     if (!schemaTypeNode?.astNode) {
@@ -13,41 +13,19 @@ export const singleCallServicesObjectCalculator = (options: { directive: GraphQL
     }
 
     const directiveValues = getDirectiveValues(options.directive, schemaTypeNode.astNode);
+    const services = directiveValues?.services as string[] | undefined;
 
     // No directive
-    if (!directiveValues) {
+    if (!services) {
       return;
     }
 
-    console.log('directiveValues', directiveValues);
+    for (const service of services) {
+      if (childComplexity.extra?.services?.[service]) {
+        childComplexity.extra.services[service].value = 1;
+      }
+    }
 
     return;
-
-    // const extra: Extra = {};
-
-    // /**
-    //  * Services
-    //  */
-    // const services = directiveValues.services as string[] | undefined;
-    // if (services) {
-    //   const servicesObj: ComplexityServices = Object.fromEntries(
-    //     services.map((serviceName) => [serviceName, { value: 1 }])
-    //   );
-    //   extra.services = servicesObj;
-    // }
-
-    // /**
-    //  * Max times
-    //  */
-    // if (directiveValues.maxTimes) {
-    //   extra.maxTimes = {
-    //     [`type-${args.fieldTypeName}`]: {
-    //       maxTimes: directiveValues.maxTimes,
-    //       value: 1,
-    //     },
-    //   };
-    // }
-
-    // return { extra };
   };
 };

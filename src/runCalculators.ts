@@ -1,16 +1,17 @@
-import { ChildComplexity, getChildComplexity } from './getChildComplexity';
-import { mergeExtra } from './mergeExtra';
-import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, Extra } from '.';
-import { nonNullable } from './utils';
+import { ComplexityCalculator, ComplexityCalculatorArgs, ComplexityNode, Extra, ExtraMerger } from '.';
 import { ComplexityCalculatorAccumulator } from './commonTypes';
+import { ChildComplexity, getChildComplexity } from './getChildComplexity';
+import { mergeExtraDefault } from './mergers/mergeExtraDefault';
 
 export const runCalculators = ({
   calculators,
   calculatorArgs,
+  extraMerger,
   children,
 }: {
   calculators: ComplexityCalculator[];
   calculatorArgs: ComplexityCalculatorArgs;
+  extraMerger?: ExtraMerger;
   children: ComplexityNode[] | null;
 }): {
   thisCost: number;
@@ -19,6 +20,8 @@ export const runCalculators = ({
   extra: Extra;
   childComplexity: ChildComplexity;
 } => {
+  const childComplexity = getChildComplexity(children);
+
   const accumulator: ComplexityCalculatorAccumulator = {
     cost: 0,
     multiplier: null,
@@ -26,16 +29,12 @@ export const runCalculators = ({
   };
 
   for (const calculator of calculators) {
-    calculator(calculatorArgs, accumulator);
+    calculator(calculatorArgs, accumulator, childComplexity);
   }
 
-  const childComplexity = getChildComplexity(children);
-
   const cost = accumulator.cost + childComplexity.childComplexity * (accumulator.multiplier || 1);
-
-  const allExtras = [accumulator.extra, childComplexity.extra].filter(nonNullable);
-  const multipliedExtras = [...Array(accumulator.multiplier || 1)].map((_) => allExtras).flat();
-  const extra = mergeExtra('sum', ...multipliedExtras);
+  const negotiatedExtraMerger = extraMerger || mergeExtraDefault;
+  const extra = negotiatedExtraMerger(calculatorArgs, accumulator, childComplexity);
 
   return { thisCost: accumulator.cost, multiplier: accumulator.multiplier, cost, extra, childComplexity };
 };

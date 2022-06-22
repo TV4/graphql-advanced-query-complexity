@@ -18,6 +18,7 @@ export const handleField = ({
   skipDirectiveDef,
   getNodeComplexity,
   calculators,
+  extraMerger,
   schema,
 }: CommonHandle & {
   childNode: FieldNode;
@@ -56,6 +57,7 @@ export const handleField = ({
         skipDirectiveDef,
         variableValues,
         calculators,
+        extraMerger,
         schema,
       })
     : [];
@@ -74,6 +76,7 @@ export const handleField = ({
   const { multiplier, thisCost, cost, childComplexity, extra } = runCalculators({
     calculatorArgs,
     calculators,
+    extraMerger,
     children,
   });
 

@@ -1,3 +1,4 @@
+import { mergeExtraDefault } from './mergers/mergeExtraDefault';
 import {
   DocumentNode,
   FieldNode,
@@ -35,6 +36,7 @@ import { createServicesPostCalculation } from './postCalculation/servicesPostCal
 import { createMaxCostPostCalculation } from './postCalculation/maxCostPostCalculation';
 import { createSingleCallServicesDirective } from './directives/singleCallServicesDirective';
 import { singleCallServicesObjectCalculator } from './calculators/singleCallServicesObjectCalculator';
+import { ChildComplexity } from './getChildComplexity';
 
 export {
   fieldCalculator,
@@ -47,6 +49,7 @@ export {
   maxCallPostCalculation,
   createMaxCostPostCalculation,
   createServicesPostCalculation,
+  mergeExtraDefault,
 };
 
 export type ComplexityNode = {
@@ -74,18 +77,27 @@ export type Extra = Record<string, any>;
 
 export type ComplexityCalculator = (
   options: ComplexityCalculatorArgs,
-  accumulator: ComplexityCalculatorAccumulator
+  accumulator: ComplexityCalculatorAccumulator,
+  childComplexity: ChildComplexity
 ) => void;
+
+export type ExtraMerger = (
+  options: ComplexityCalculatorArgs,
+  accumulator: ComplexityCalculatorAccumulator,
+  childComplexity: ChildComplexity
+) => Extra;
 
 export interface QueryComplexityOptions {
   variables?: Record<string, any>;
   calculators: Array<ComplexityCalculator>;
+  extraMerger?: ExtraMerger;
 }
 
 export type PostCalculation = (complexity: ComplexityCollector) => void;
 
 export type ComplexityOptions = {
   calculators: ComplexityCalculator[];
+  extraMerger?: ExtraMerger;
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
@@ -101,6 +113,7 @@ export function getComplexity(options: ComplexityOptions): Complexity {
     const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
     const visitor = new QueryComplexity(context, {
       calculators: options.calculators,
+      extraMerger: options.extraMerger,
       variables: options.variables,
     });
 
@@ -184,6 +197,7 @@ const getChilds: GetNodeComplexity = ({
   skipDirectiveDef,
   variableValues,
   calculators,
+  extraMerger,
   schema,
 }) => {
   let fields: GraphQLFieldMap<any, any> = {};
@@ -202,15 +216,16 @@ const getChilds: GetNodeComplexity = ({
       }
 
       const fieldData = {
-        typeDef: typeDef,
-        validationContext: validationContext,
-        variableValues: variableValues,
-        fields: fields,
-        includeDirectiveDef: includeDirectiveDef,
-        skipDirectiveDef: skipDirectiveDef,
+        typeDef,
+        validationContext,
+        variableValues,
+        fields,
+        includeDirectiveDef,
+        skipDirectiveDef,
         getNodeComplexity: getChilds,
-        calculators: calculators,
-        schema: schema,
+        calculators,
+        extraMerger,
+        schema,
       };
 
       switch (childNode.kind) {
@@ -253,6 +268,7 @@ class QueryComplexity {
   options: QueryComplexityOptions;
   OperationDefinition: Record<string, any>;
   calculators: Array<ComplexityCalculator>;
+  extraMerger?: ExtraMerger;
   includeDirectiveDef?: GraphQLDirective;
   skipDirectiveDef?: GraphQLDirective;
   variableValues: Record<string, any>;
@@ -262,6 +278,7 @@ class QueryComplexity {
     this.complexity = { cost: 0, tree: null, extra: {}, errors: [] };
     this.options = options;
     this.calculators = options.calculators;
+    this.extraMerger = options.extraMerger;
     this.variableValues = {};
     this.OperationDefinition = {
       enter: this.onOperationDefinitionEnter,
@@ -310,6 +327,7 @@ class QueryComplexity {
           skipDirectiveDef: this.skipDirectiveDef,
           variableValues: this.variableValues,
           calculators: this.calculators,
+          extraMerger: this.extraMerger,
           schema: this.context.getSchema(),
         });
 

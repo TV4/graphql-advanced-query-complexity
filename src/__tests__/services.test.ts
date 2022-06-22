@@ -13,6 +13,7 @@ import {
 } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
+import { createSingleCallServiceExtraMerger } from '../mergers/createSingleCallServiceExtraMerger';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());
@@ -461,6 +462,7 @@ describe.only('single call service directive', () => {
         test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
       }
 
+      #
       type Obj @singleCallServices(services: ["serviceX"]) {
         string: String @complexity(services: ["serviceX"])
         string2: String @complexity(services: ["serviceX", "serviceY"])
@@ -487,6 +489,7 @@ describe.only('single call service directive', () => {
       ],
       schema,
       query,
+      extraMerger: createSingleCallServiceExtraMerger({ directive: createSingleCallServicesDirective() }),
       postCalculations: [
         createServicesPostCalculation({
           serviceX: {
@@ -499,10 +502,20 @@ describe.only('single call service directive', () => {
       ],
     });
 
+    // console.log(
+    //   require('util').inspect(complexity.getTree(), { showHidden: true, depth: null, colors: true, breakLength: 200 })
+    // );
+
     /**
-     * string is called 4 times and uses serviceX = 4 * 100
+     * string is called 4 times and uses serviceX = 4 * 100.
      * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
+     *
+     * However, serviceX is annotated as @singleCallServices which means that it's only
+     * going to count as 1. So the 4+4 calls, costing 100 each, is only going to be
+     * counted as 1 at the cost of 100.
+     *
+     * So final cost is 100 + 4 * 20.
      */
-    expect(complexity.cost).toBe(880);
+    expect(complexity.cost).toBe(180);
   });
 });

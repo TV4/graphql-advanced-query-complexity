@@ -11,7 +11,7 @@ import {
   InlineFragmentNode,
   OperationDefinitionNode,
 } from 'graphql';
-import { ComplexityCalculator, ComplexityNode, Extra } from '.';
+import { ComplexityCalculator, ComplexityNode, Extra, ExtraMerger } from '.';
 
 export type NodeComplexityBase = {
   typeDef: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
@@ -20,6 +20,7 @@ export type NodeComplexityBase = {
   includeDirectiveDef?: GraphQLDirective;
   skipDirectiveDef?: GraphQLDirective;
   calculators: Array<ComplexityCalculator>;
+  extraMerger?: ExtraMerger;
   schema: GraphQLSchema;
 };
 

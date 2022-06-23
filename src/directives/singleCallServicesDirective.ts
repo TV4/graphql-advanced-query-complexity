@@ -7,7 +7,7 @@ import {
   GraphQLString,
 } from 'graphql';
 
-const DEFAULT_TYPE_COMPLEXITY_NAME = 'singleCallServices';
+const DEFAULT_TYPE_COMPLEXITY_NAME = 'singleCallServicesComplexity';
 
 export type TypeComplexityDirectiveOptions = {
   name?: string;
@@ -34,7 +34,7 @@ export const createSingleCallServicesDirective = (options?: TypeComplexityDirect
   return new GraphQLDirective({
     name: options?.name || DEFAULT_TYPE_COMPLEXITY_NAME,
     description: '',
-    locations: [DirectiveLocation.OBJECT],
+    locations: [DirectiveLocation.OBJECT, DirectiveLocation.FIELD_DEFINITION],
     args,
   });
 };

@@ -462,7 +462,7 @@ describe('single call service directive', () => {
       }
 
       #
-      type Obj @singleCallServices(services: ["serviceX"]) {
+      type Obj @singleCallServicesComplexity(services: ["serviceX"]) {
         string: String @complexity(services: ["serviceX"])
         string2: String @complexity(services: ["serviceX", "serviceY"])
       }
@@ -504,7 +504,7 @@ describe('single call service directive', () => {
      * string is called 4 times and uses serviceX = 4 * 100.
      * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
      *
-     * However, serviceX is annotated as @singleCallServices which means that it's only
+     * However, serviceX is annotated as @singleCallServicesComplexity which means that it's only
      * going to count as 1 per Obj. So the 2 calls to serviceX inside Obj are counted as 1.
      *
      * So final cost is (4 * 100) + (4 * 20).
@@ -522,7 +522,7 @@ describe('single call service directive', () => {
         test(amount: Int = 5): [Obj] @complexity(multiplier: "amount")
       }
 
-      type Obj @singleCallServices(services: ["serviceX"]) {
+      type Obj @singleCallServicesComplexity(services: ["serviceX"]) {
         obj1: Obj1
         obj2: Obj2
       }
@@ -576,7 +576,7 @@ describe('single call service directive', () => {
      * string is called 4 times and uses serviceX = 4 * 100.
      * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
      *
-     * However, serviceX is annotated as @singleCallServices which means that it's only
+     * However, serviceX is annotated as @singleCallServicesComplexity which means that it's only
      * going to count as 1 per Obj. So the 2 calls to serviceX inside Obj are counted as 1.
      *
      * So final cost is (4 * 100) + (4 * 20).

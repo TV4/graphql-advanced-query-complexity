@@ -36,10 +36,12 @@ import { createServicesPostCalculation } from './postCalculation/servicesPostCal
 import { createMaxCostPostCalculation } from './postCalculation/maxCostPostCalculation';
 import { createSingleCallServicesDirective } from './directives/singleCallServicesDirective';
 import { ChildComplexity } from './getChildComplexity';
+import { singleCallServicesObjectCalculator } from './calculators/singleCallServicesObjectCalculator';
 
 export {
   fieldCalculator,
   objectCalculator,
+  singleCallServicesObjectCalculator,
   createSDLFromDirective,
   createObjectDirective,
   createFieldDirective,

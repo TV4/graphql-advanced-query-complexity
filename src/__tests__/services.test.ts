@@ -9,6 +9,7 @@ import {
   createSDLFromDirective,
   createServicesPostCalculation,
   getComplexity,
+  singleCallServicesObjectCalculator,
 } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
@@ -482,10 +483,12 @@ describe('single call service directive', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      calculators,
+      calculators: [
+        ...calculators,
+        singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+      ],
       schema,
       query,
-      extraMerger: createSingleCallServiceExtraMerger({ directive: createSingleCallServicesDirective() }),
       postCalculations: [
         createServicesPostCalculation({
           serviceX: {
@@ -503,12 +506,11 @@ describe('single call service directive', () => {
      * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
      *
      * However, serviceX is annotated as @singleCallServices which means that it's only
-     * going to count as 1. So the 4+4 calls, costing 100 each, is only going to be
-     * counted as 1 at the cost of 100.
+     * going to count as 1 per Obj. So the 2 calls to serviceX inside Obj are counted as 1.
      *
-     * So final cost is 100 + 4 * 20.
+     * So final cost is (4 * 100) + (4 * 20).
      */
-    expect(complexity.cost).toBe(180);
+    expect(complexity.cost).toBe(480);
   });
 
   it('singleCallService on object, deep nested', async () => {
@@ -553,10 +555,12 @@ describe('single call service directive', () => {
     expect(validationResults).toEqual([]);
 
     const complexity = getComplexity({
-      calculators,
+      calculators: [
+        ...calculators,
+        singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+      ],
       schema,
       query,
-      extraMerger: createSingleCallServiceExtraMerger({ directive: createSingleCallServicesDirective() }),
       postCalculations: [
         createServicesPostCalculation({
           serviceX: {
@@ -574,13 +578,13 @@ describe('single call service directive', () => {
      * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
      *
      * However, serviceX is annotated as @singleCallServices which means that it's only
-     * going to count as 1. So the 4+4 calls, costing 100 each, is only going to be
-     * counted as 1 at the cost of 100.
+     * going to count as 1 per Obj. So the 2 calls to serviceX inside Obj are counted as 1.
      *
-     * So final cost is 100 + 4 * 20.
+     * So final cost is (4 * 100) + (4 * 20).
      */
-    expect(complexity.cost).toBe(180);
+    expect(complexity.cost).toBe(480);
   });
 
+  it.todo('singleCallService on outside a list');
   it.todo('singleCallService on field');
 });

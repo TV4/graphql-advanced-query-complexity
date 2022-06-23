@@ -532,6 +532,10 @@ describe('single call service directive', () => {
       }
 
       type Obj2 {
+        obj3: Obj3
+      }
+
+      type Obj3 {
         string: String @complexity(services: ["serviceX", "serviceY"])
       }
     `;
@@ -543,7 +547,9 @@ describe('single call service directive', () => {
             string
           }
           obj2 {
-            string
+            obj3 {
+              string
+            }
           }
         }
       }

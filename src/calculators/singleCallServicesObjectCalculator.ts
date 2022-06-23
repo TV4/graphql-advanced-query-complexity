@@ -6,13 +6,21 @@ export type ComplexityServices = Record<string, { value: number }>;
 
 export const singleCallServicesObjectCalculator = (options: { directive: GraphQLDirective }): ComplexityCalculator => {
   return (args, _accumulator, childComplexity) => {
-    const schemaTypeNode = args.schema.getType(args.fieldTypeName);
+    let directiveValues: ReturnType<typeof getDirectiveValues> = undefined;
 
-    if (!schemaTypeNode?.astNode) {
-      return;
+    // Field directive
+    if (args.field?.astNode) {
+      directiveValues = getDirectiveValues(options.directive, args.field.astNode);
     }
 
-    const directiveValues = getDirectiveValues(options.directive, schemaTypeNode.astNode);
+    // Object directive
+    if (!directiveValues) {
+      const schemaTypeNode = args.schema.getType(args.fieldTypeName);
+      if (schemaTypeNode?.astNode) {
+        directiveValues = getDirectiveValues(options.directive, schemaTypeNode.astNode);
+      }
+    }
+
     const services = directiveValues?.services as string[] | undefined;
 
     // No directive

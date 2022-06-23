@@ -591,5 +591,84 @@ describe('single call service directive', () => {
   });
 
   it.todo('singleCallService on outside a list');
-  it.todo('singleCallService on field');
+
+  it('singleCallService on field, deep nested', async () => {
+    const baseSchema = gql`
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
+      ${singleCallServicesDirectiveSDL}
+
+      type Query {
+        test(amount: Int = 5): [Obj]
+          @complexity(multiplier: "amount")
+          @singleCallServicesComplexity(services: ["serviceX"])
+      }
+
+      type Obj {
+        obj1: Obj1
+        obj2: Obj2
+      }
+
+      type Obj1 {
+        string: String @complexity(services: ["serviceX"])
+      }
+
+      type Obj2 {
+        obj3: Obj3
+      }
+
+      type Obj3 {
+        string: String @complexity(services: ["serviceX", "serviceY"])
+      }
+    `;
+
+    const query = gql`
+      query {
+        test(amount: 4) {
+          obj1 {
+            string
+          }
+          obj2 {
+            obj3 {
+              string
+            }
+          }
+        }
+      }
+    `;
+
+    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+    expect(validationResults).toEqual([]);
+
+    const complexity = getComplexity({
+      calculators: [
+        ...calculators,
+        singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+      ],
+      schema,
+      query,
+      postCalculations: [
+        createServicesPostCalculation({
+          serviceX: {
+            cost: 100,
+          },
+          serviceY: {
+            cost: 20,
+          },
+        }),
+      ],
+    });
+
+    /**
+     * string is called 4 times and uses serviceX = 4 * 100.
+     * string2 is called 4 times and uses serviceX = 4 * 100 _and_ serviceY = 4 * 20.
+     *
+     * However, serviceX is annotated as @singleCallServicesComplexity which means that it's only
+     * going to count as 1 per Obj. So the 2 calls to serviceX inside Obj are counted as 1.
+     *
+     * So final cost is (4 * 100) + (4 * 20).
+     */
+    expect(complexity.cost).toBe(480);
+  });
 });

@@ -1,4 +1,3 @@
-import { mergeExtraDefault } from './mergers/mergeExtraDefault';
 import {
   DocumentNode,
   FieldNode,
@@ -49,7 +48,6 @@ export {
   maxCallPostCalculation,
   createMaxCostPostCalculation,
   createServicesPostCalculation,
-  mergeExtraDefault,
 };
 
 export type ComplexityNode = {
@@ -81,23 +79,15 @@ export type ComplexityCalculator = (
   childComplexity: ChildComplexity
 ) => void;
 
-export type ExtraMerger = (
-  options: ComplexityCalculatorArgs,
-  accumulator: ComplexityCalculatorAccumulator,
-  childComplexity: ChildComplexity
-) => Extra;
-
 export interface QueryComplexityOptions {
   variables?: Record<string, any>;
   calculators: Array<ComplexityCalculator>;
-  extraMerger?: ExtraMerger;
 }
 
 export type PostCalculation = (complexity: ComplexityCollector) => void;
 
 export type ComplexityOptions = {
   calculators: ComplexityCalculator[];
-  extraMerger?: ExtraMerger;
   schema: GraphQLSchema;
   query: DocumentNode;
   variables?: Record<string, any>;
@@ -113,7 +103,6 @@ export function getComplexity(options: ComplexityOptions): Complexity {
     const context = new ValidationContext(options.schema, options.query, typeInfo, (error) => errors.push(error));
     const visitor = new QueryComplexity(context, {
       calculators: options.calculators,
-      extraMerger: options.extraMerger,
       variables: options.variables,
     });
 
@@ -197,7 +186,6 @@ const getChilds: GetNodeComplexity = ({
   skipDirectiveDef,
   variableValues,
   calculators,
-  extraMerger,
   schema,
 }) => {
   let fields: GraphQLFieldMap<any, any> = {};
@@ -224,7 +212,6 @@ const getChilds: GetNodeComplexity = ({
         skipDirectiveDef,
         getNodeComplexity: getChilds,
         calculators,
-        extraMerger,
         schema,
       };
 
@@ -268,7 +255,6 @@ class QueryComplexity {
   options: QueryComplexityOptions;
   OperationDefinition: Record<string, any>;
   calculators: Array<ComplexityCalculator>;
-  extraMerger?: ExtraMerger;
   includeDirectiveDef?: GraphQLDirective;
   skipDirectiveDef?: GraphQLDirective;
   variableValues: Record<string, any>;
@@ -278,7 +264,6 @@ class QueryComplexity {
     this.complexity = { cost: 0, tree: null, extra: {}, errors: [] };
     this.options = options;
     this.calculators = options.calculators;
-    this.extraMerger = options.extraMerger;
     this.variableValues = {};
     this.OperationDefinition = {
       enter: this.onOperationDefinitionEnter,
@@ -327,7 +312,6 @@ class QueryComplexity {
           skipDirectiveDef: this.skipDirectiveDef,
           variableValues: this.variableValues,
           calculators: this.calculators,
-          extraMerger: this.extraMerger,
           schema: this.context.getSchema(),
         });
 

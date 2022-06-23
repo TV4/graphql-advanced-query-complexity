@@ -14,7 +14,6 @@ export const handleFragmentSpread = ({
   skipDirectiveDef,
   getNodeComplexity,
   calculators,
-  extraMerger,
   schema,
 }: CommonHandle & {
   childNode: FragmentSpreadNode;
@@ -44,7 +43,6 @@ export const handleFragmentSpread = ({
     skipDirectiveDef,
     variableValues,
     calculators,
-    extraMerger,
     schema,
   });
 

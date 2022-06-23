@@ -14,7 +14,6 @@ export const handleInlineFragment = ({
   skipDirectiveDef,
   getNodeComplexity,
   calculators,
-  extraMerger,
   schema,
 }: CommonHandle & {
   childNode: InlineFragmentNode;
@@ -48,7 +47,6 @@ export const handleInlineFragment = ({
     skipDirectiveDef,
     variableValues,
     calculators,
-    extraMerger,
     schema,
   });
 
@@ -56,7 +54,6 @@ export const handleInlineFragment = ({
     calculatorArgs,
     calculators,
     children,
-    extraMerger,
   });
 
   return {

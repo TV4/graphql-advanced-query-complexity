@@ -13,7 +13,6 @@ import {
 } from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
-import { createSingleCallServiceExtraMerger } from '../mergers/createSingleCallServiceExtraMerger';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());

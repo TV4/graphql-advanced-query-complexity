@@ -56,7 +56,7 @@ would return:
   - `exampleQuery` having a cost of 10.
   - Total cost of 77 + 10 = 87
 
-## Service based (data loaded/batched) example
+## Service based example
 
 Imagine this query:
 
@@ -115,7 +115,68 @@ const complexity = getComplexity({
 - `cost` every time you call this, this cost is going to be added to the final tally. If `calledOnce` is set to true, then the cost is only going to get inflicted once.
 - `maxTimes` how many times this service may be called in a single query. Use e.g. for fields and types that are only supposed to be called once, and not in a list of items. In this example, the `playback` field is only supposed to be run on-demand for a single movie when the user wants to start a movie, and not as part of the listing of the movies.
 
-TODO CONTINUE HERE
+## Advanced service based (cached/data loaded) example
+
+Imagine that we have a query that resolves a list of movies and on each movie you can query for `duration` and `spokenLangauges` but to be able to resolve that you need to figure out what media files the user has access to. To get some performance into this, we cache the results, so that it doesn't matter if the user queries for only `duration` or `spokenLanguages` or if they query for both.
+
+Example schema
+
+```gql
+type Query {
+  panel: Panel
+}
+
+type Panel {
+  movies(limit: Int): [Movie] @complexity(multiplier: "limit")
+}
+
+type Movie @singleCallServicesComplexity(services: ["mediaCalculator"]) {
+  title: String
+  duration: Int @complexity(services: ["mediaCalculator"])
+  spokenLanguages: String @complexity(services: ["mediaCalculator"])
+}
+```
+
+and query:
+
+```gql
+query {
+  panel {
+    movies(limit: 6) {
+      title
+      duration
+      spokenLanguages
+    }
+  }
+}
+```
+
+and calling function:
+
+```ts
+const complexity = getComplexity({
+  schema,
+  query,
+  calculators: [
+    objectCalculator({ directive: createObjectDirective() }),
+    fieldCalculator({ directive: createFieldDirective() }),
+    singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+  ],
+  postCalculations: [
+    createServicesPostCalculation({
+      mediaCalculator: {
+        cost: 100,
+      },
+    }),
+  ],
+});
+```
+
+In this example above we're queyring for `panel.movies` which is a list that we want 6 `Movie`'s from. On each movie we're asking for `duration` and `spokenLanguages` which both are annotated with `@complexity(services: ["mediaCalculator"])`. This means that we're using the `mediaCalculator` service 12 (6 x 2) times. As each call to the service comes with a cost of `100`, the final cost for this query is `1200`
+
+However! The `Movie` type is annotated with `@singleCallServicesComplexity(services: ["mediaCalculator"])` which can be read as "Treat multiple calls to the `mediaCalculator` of any of my fields, or child fields as a single call". This means that it's only called 6 x 1 times and the final cost for the query is therefor `600`.
+
+The `@singleCallServicesComplexity` directive may be added on both an object and a field.
 
 ## Installation
 
@@ -136,14 +197,23 @@ import {
   getComplexity,
   fieldCalculator,
   objectCalculator,
+  singleCallServicesObjectCalculator,
   maxCallPostCalculation,
   createMaxCostPostCalculation,
+  createObjectDirective,
+  createFieldDirective,
+  createSingleCallServicesDirective,
 } from '@tv4/graphql-advanced-query-complexity';
 
 export const objectDirective = createObjectDirective();
 export const fieldDirective = createFieldDirective();
+export const singleCallDirective = createSingleCallServicesDirective();
 
-const calculators = [objectCalculator({ directive: objectDirective }), fieldCalculator({ directive: fieldDirective })];
+const calculators = [
+  objectCalculator({ directive: objectDirective }),
+  fieldCalculator({ directive: fieldDirective }),
+  singleCallServicesObjectCalculator({ directive: singleCallDirective }),
+];
 
 const queryComplexityPlugin: ApolloServerPlugin<Context> = {
   requestDidStart: async () => ({
@@ -157,7 +227,15 @@ const queryComplexityPlugin: ApolloServerPlugin<Context> = {
         schema,
         query: parse(request.query),
         variables: request.variables,
-        postCalculations: [maxCallPostCalculation, createMaxCostPostCalculation({ maxCost: 6 })],
+        postCalculations: [
+          maxCallPostCalculation,
+          createMaxCostPostCalculation({ maxCost: 6 }),
+          // createServicesPostCalculation({
+          //   myService: {
+          //     cost: 100,
+          //   },
+          // }),
+        ],
         // onParseError: (_error) => {},
       });
 
@@ -185,13 +263,14 @@ export const server = new ApolloServer({
 This example shows the SDL way. In your schema index file, add the two directives
 
 ```ts
-import { objectDirective, fieldDirective } from './your/plugin/file.ts';
+import { objectDirective, fieldDirective, singleCallDirective } from './your/plugin/file.ts';
 
 const objectDirectiveSDL = createSDLFromDirective(objectDirective);
 const fieldDirectiveSDL = createSDLFromDirective(fieldDirective);
+const singleCallDirectiveSDL = createSDLFromDirective(singleCallDirective);
 
 export const schema = makeExecutableSchema({
-  typeDefs: [objectDirectiveSDL, fieldDirectiveSDL, otherPartsOfYourSchema],
+  typeDefs: [objectDirectiveSDL, fieldDirectiveSDL, singleCallDirective, otherPartsOfYourSchema],
 });
 ```
 
@@ -253,12 +332,13 @@ The directives take an optional name, which is what you will use it in your sche
 ```ts
 createFieldDirective({ name: 'complexity' });
 createObjectDirective({ name: 'objComplexity' });
+createSingleCallServicesDirective({ name: 'singleCallServicesComplexity' });
 ```
 
 ```gql
-type Obj @objComplexity(maxTimes: 10) {}
+type Obj @objComplexity(maxTimes: 10) @singleCallServicesComplexity(services: ["myService", "anotherService"]) {}
 type Query {
-  field: String @complexity(maxTimes: 10)
+  field: String @complexity(maxTimes: 10) @singleCallServicesComplexity(services: ["myService"])
 }
 ```
 
@@ -269,6 +349,7 @@ The default calculators take the corresponding directive as parameters.
 ```ts
 objectCalculator({ directive: createObjectDirective() });
 fieldCalculator({ directive: createFieldDirective() });
+singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
 ```
 
 ## `getComplexity`
@@ -297,10 +378,22 @@ variables: request.variables;
 
 By default, the `graphql-advanced-query-complexity` does not _do_ anything with the results. It simply calculates all values. You may however provide a "post calculation" which will check the results and possibly write one or many errors to the `errors` field of the output. A post calculation may modify any part of the calculated complexity.
 
-Two default post calculators are provided, `maxCallPostCalculation` which will create errors if `maxTimes` is passed and `createMaxCostPostCalculation` which will create an error if the cost of the query is over your limit.
+Some default post calculators are provided.
+
+- `maxCallPostCalculation` which will create errors if `maxTimes` is passed,
+- `createMaxCostPostCalculation` which will create an error if the cost of the query is over your limit.
+- `createServicesPostCalculation` adds costs to _services_ if you use service based costs.
 
 ```ts
-postCalculations: [maxCallPostCalculation, createMaxCostPostCalculation({ maxCost: 6 })];
+postCalculations: [
+  maxCallPostCalculation,
+  createMaxCostPostCalculation({ maxCost: 6 }),
+  createServicesPostCalculation({
+    myService: {
+      cost: 100,
+    },
+  }),
+];
 ```
 
 #### `onParseError`

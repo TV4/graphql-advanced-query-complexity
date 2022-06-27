@@ -2,13 +2,21 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { validateGraphQlDocuments } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
 
-import { getComplexity, maxCallPostCalculation, createMaxCostPostCalculation, createServicesPostCalculation } from '..';
+import {
+  getComplexity,
+  maxCallPostCalculation,
+  createMaxCostPostCalculation,
+  createServicesPostCalculation,
+  createSingleCallServicesDirective,
+  singleCallServicesObjectCalculator,
+} from '..';
 import { fieldCalculator } from '../calculators/fieldCalculator';
 import { objectCalculator } from '../calculators/objectCalculator';
 import { createFieldDirective, createObjectDirective, createSDLFromDirective } from '..';
 
 const objectDirectiveSDL = createSDLFromDirective(createObjectDirective());
 const fieldDirectiveSDL = createSDLFromDirective(createFieldDirective());
+const singleCallServicesDirectiveSDL = createSDLFromDirective(createSingleCallServicesDirective());
 
 const calculators = [
   objectCalculator({ directive: createObjectDirective() }),
@@ -144,4 +152,60 @@ it('services', async () => {
 
   expect(complexity.cost).toBe(110);
   expect(complexity.errors?.[0].message).toBe('Service engagement may only be queried 1 times. Was queried 4 times');
+});
+
+it('singleCallService', async () => {
+  const baseSchema = gql`
+    ${fieldDirectiveSDL}
+    ${objectDirectiveSDL}
+    ${singleCallServicesDirectiveSDL}
+
+    type Query {
+      panel: Panel
+    }
+
+    type Panel {
+      movies(limit: Int): [Movie] @complexity(multiplier: "limit")
+    }
+
+    type Movie @singleCallServicesComplexity(services: ["mediaCalculator"]) {
+      title: String
+      duration: Int @complexity(services: ["mediaCalculator"])
+      spokenLanguages: String @complexity(services: ["mediaCalculator"])
+    }
+  `;
+
+  const query = gql`
+    query {
+      panel {
+        movies(limit: 6) {
+          title
+          duration
+          spokenLanguages
+        }
+      }
+    }
+  `;
+
+  const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+  const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+  expect(validationResults).toEqual([]);
+
+  const complexity = getComplexity({
+    calculators: [
+      ...calculators,
+      singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+    ],
+    schema,
+    query,
+    postCalculations: [
+      createServicesPostCalculation({
+        mediaCalculator: {
+          cost: 100,
+        },
+      }),
+    ],
+  });
+
+  expect(complexity.cost).toBe(600);
 });

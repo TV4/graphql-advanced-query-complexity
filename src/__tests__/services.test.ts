@@ -590,8 +590,6 @@ describe('single call service directive', () => {
     expect(complexity.cost).toBe(480);
   });
 
-  it.todo('singleCallService on outside a list');
-
   it('singleCallService on field, deep nested', async () => {
     const baseSchema = gql`
       ${fieldDirectiveSDL}
@@ -670,5 +668,60 @@ describe('single call service directive', () => {
      * So final cost is (4 * 100) + (4 * 20).
      */
     expect(complexity.cost).toBe(480);
+  });
+
+  it('singleCallService on field, nested outside list', async () => {
+    const baseSchema = gql`
+      ${fieldDirectiveSDL}
+      ${objectDirectiveSDL}
+      ${singleCallServicesDirectiveSDL}
+
+      type Query {
+        test: Obj @singleCallServicesComplexity(services: ["serviceX"])
+      }
+
+      type Obj {
+        list(amount: Int = 5): ServiceCallingObj
+      }
+
+      type ServiceCallingObj {
+        string: String @complexity(services: ["serviceX"])
+      }
+    `;
+
+    const query = gql`
+      query {
+        test {
+          list(amount: 4) {
+            string
+          }
+        }
+      }
+    `;
+
+    const schema = makeExecutableSchema({ typeDefs: [baseSchema] });
+    const validationResults = await validateGraphQlDocuments(schema, [{ document: query }]);
+    expect(validationResults).toEqual([]);
+
+    const complexity = getComplexity({
+      calculators: [
+        ...calculators,
+        singleCallServicesObjectCalculator({ directive: createSingleCallServicesDirective() }),
+      ],
+      schema,
+      query,
+      postCalculations: [
+        createServicesPostCalculation({
+          serviceX: {
+            cost: 100,
+          },
+          serviceY: {
+            cost: 20,
+          },
+        }),
+      ],
+    });
+
+    expect(complexity.cost).toBe(100);
   });
 });

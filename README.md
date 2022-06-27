@@ -4,9 +4,9 @@ When you need to make rules about how your GraphQL server is allowed to be queri
 
 Main features:
 
-- Objects can be annotated, not just fields.
+- Objects can be annotated (e.g. with a cost), not just fields.
 - Limit the amount of times an field or an object may be queried
-- Support data loaded/batched data. Even if a field/object is called multiple times, calculate it as one.
+- Support data loaded/cached/batched data. "Service" based calculation. If multiple services are called (in completely different places of the query tree) handle it as a single call to the service.
 - Calculate complexity based on cost of individual fields or types
 - Take lists into account so that a list of 2 items are calculated twice.
 - Extendable with your own calculators

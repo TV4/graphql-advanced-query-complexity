@@ -260,7 +260,7 @@ export const server = new ApolloServer({
 - If you create your schema with code, you want to use the directives (`objectDirective` and `fieldDirective`) created and exported in your plugins file, as is.
 - If you create your schema with SDL (typically `.gql` files or the `gql` tag in Javascript/Typescript), you must first convert it to SDL
 
-This example shows the SDL way. In your schema index file, add the two directives
+This example shows the SDL way. In your schema index file, add the directives
 
 ```ts
 import { objectDirective, fieldDirective, singleCallDirective } from './your/plugin/file.ts';
@@ -323,7 +323,7 @@ The errors are instances of `GraphQLError`.
 
 ## Usage
 
-This package exports two default directives and calculators. You're also free to write your own.
+This package exports a few default directives and calculators. You're also free to write your own.
 
 ### Directives
 
@@ -380,19 +380,19 @@ By default, the `graphql-advanced-query-complexity` does not _do_ anything with 
 
 Some default post calculators are provided.
 
-- `maxCallPostCalculation` which will create errors if `maxTimes` is passed,
-- `createMaxCostPostCalculation` which will create an error if the cost of the query is over your limit.
 - `createServicesPostCalculation` adds costs to _services_ if you use service based costs.
+- `maxCallPostCalculation` will create errors if `maxTimes` is passed,
+- `createMaxCostPostCalculation` will create an error if the cost of the query is over your limit.
 
 ```ts
 postCalculations: [
-  maxCallPostCalculation,
-  createMaxCostPostCalculation({ maxCost: 6 }),
   createServicesPostCalculation({
     myService: {
       cost: 100,
     },
   }),
+  maxCallPostCalculation,
+  createMaxCostPostCalculation({ maxCost: 6 }),
 ];
 ```
 
